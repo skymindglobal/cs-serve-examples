@@ -1,0 +1,31 @@
+{
+  "name": "squeezenet_profile",
+  "description": "",
+  "image": null,
+  "type": "DEFAULT",
+  "transportType": "DEFAULT",
+  "provisionType": "DISABLED",
+  "defaultRuleChainId": {
+    "entityType": "RULE_CHAIN",
+    "id": "233ce810-d94f-11eb-98c7-bfe43167b39d"
+  },
+  "defaultDashboardId": null,
+  "defaultQueueName": null,
+  "profileData": {
+    "configuration": {
+      "type": "DEFAULT"
+    },
+    "transportConfiguration": {
+      "type": "DEFAULT"
+    },
+    "provisionConfiguration": {
+      "type": "DISABLED",
+      "provisionDeviceSecret": null
+    },
+    "alarms": null
+  },
+  "provisionDeviceKey": null,
+  "firmwareId": null,
+  "softwareId": null,
+  "default": false
+}

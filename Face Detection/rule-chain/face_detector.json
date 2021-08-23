@@ -1,0 +1,181 @@
+{
+  "ruleChain": {
+    "additionalInfo": {
+      "description": "Face detection processing pipeline"
+    },
+    "name": "Face Detector",
+    "type": "CORE",
+    "firstRuleNodeId": null,
+    "root": false,
+    "debugMode": true,
+    "configuration": null
+  },
+  "metadata": {
+    "firstNodeIndex": 2,
+    "nodes": [
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 492,
+          "layoutY": 405
+        },
+        "type": "org.thingsboard.rule.engine.transform.TbModelNode",
+        "name": "face detector",
+        "debugMode": false,
+        "configuration": {
+          "resourceId": "fc6b3100-dd69-11eb-b7ae-0d7d633dee56",
+          "inputNames": [
+            "input"
+          ],
+          "outputNames": [
+            "boxes",
+            "scores"
+          ]
+        }
+      },
+      {
+        "additionalInfo": {
+          "layoutX": 284,
+          "layoutY": 232
+        },
+        "type": "org.thingsboard.rule.engine.filter.TbMsgTypeSwitchNode",
+        "name": "Message Type Switch",
+        "debugMode": false,
+        "configuration": {
+          "version": 0
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "Process incoming messages from devices with the alarm rules defined in the device profile. Dispatch all incoming messages with \"Success\" relation type.",
+          "layoutX": 284,
+          "layoutY": 148
+        },
+        "type": "org.thingsboard.rule.engine.profile.TbDeviceProfileNode",
+        "name": "Device Profile Node",
+        "debugMode": false,
+        "configuration": {
+          "persistAlarmRulesState": false,
+          "fetchAlarmRulesStateOnStart": false
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 494,
+          "layoutY": 321
+        },
+        "type": "org.thingsboard.rule.engine.transform.TbImageToArrayNode",
+        "name": "convert to array",
+        "debugMode": true,
+        "configuration": {
+          "inputNames": "image",
+          "outputNames": "input",
+          "ndArrayType": "FLOAT",
+          "width": 320,
+          "height": 240,
+          "includeMinibatchDim": true,
+          "aspectRatioHandling": "CENTER_CROP",
+          "ndFormat": "CHANNELS_FIRST",
+          "ndChannelLayout": "RGB",
+          "imageNormalizationType": "SCALE",
+          "listHandling": "NONE"
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 494,
+          "layoutY": 493
+        },
+        "type": "org.thingsboard.rule.engine.transform.TbTransformMsgNode",
+        "name": "select bounding box",
+        "debugMode": true,
+        "configuration": {
+          "jsScript": "box = [0,0,0,0]\r\nscore = 0;\r\n\r\nthreshold = 0.99;\r\nboxes = msg.boxes[0];\r\nconfidences = msg.scores[0];\r\n\r\nfor (var i = 0; (i * 2) < confidences.length; i++) {\r\n    score_index = i * 2;\r\n    box_index = i * 4;\r\n    current_score = confidences[score_index + 1];\r\n    if (current_score > threshold && current_score > score) {\r\n        score = current_score;\r\n        box = [boxes[box_index], boxes[box_index + 1], boxes[box_index + 2], boxes[box_index + 3]]\r\n    }\r\n} \r\n\r\nmsg.bbox = {\r\n    \"@x1\": box[0],\r\n    \"@y1\": box[1],\r\n    \"@x2\": box[2],\r\n    \"@y2\": box[3],\r\n    \"label\" : \"face\",\r\n    \"probability\" : score\r\n};\r\n\r\nreturn {msg: msg, metadata: metadata, msgType: msgType};"
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 494,
+          "layoutY": 569
+        },
+        "type": "org.thingsboard.rule.engine.transform.TbDrawBoundingBoxesNode",
+        "name": "draw bounding box",
+        "debugMode": true,
+        "configuration": {
+          "imageName": "image",
+          "bboxName": "bbox",
+          "drawLabel": false,
+          "drawProbability": false,
+          "classColors": {
+            "face": "green"
+          },
+          "color": "green",
+          "lineThickness": 2,
+          "scale": "NONE",
+          "resizeH": 100,
+          "resizeW": 100,
+          "drawCropRegion": false,
+          "cropRegionColor": "purple",
+          "ndArrayType": "FLOAT",
+          "width": null,
+          "height": null,
+          "includeMinibatchDim": true,
+          "aspectRatioHandling": "CENTER_CROP",
+          "ndFormat": "CHANNELS_FIRST",
+          "ndChannelLayout": "RGB",
+          "imageNormalizationType": "SCALE",
+          "listHandling": "NONE"
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 493,
+          "layoutY": 638
+        },
+        "type": "org.thingsboard.rule.engine.telemetry.TbMsgTimeseriesNode",
+        "name": "save_output",
+        "debugMode": false,
+        "configuration": {
+          "defaultTTL": 10
+        }
+      }
+    ],
+    "connections": [
+      {
+        "fromIndex": 0,
+        "toIndex": 4,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 1,
+        "toIndex": 3,
+        "type": "Post telemetry"
+      },
+      {
+        "fromIndex": 2,
+        "toIndex": 1,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 3,
+        "toIndex": 0,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 4,
+        "toIndex": 5,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 5,
+        "toIndex": 6,
+        "type": "Success"
+      }
+    ],
+    "ruleChainConnections": null
+  }
+}
