@@ -1,0 +1,113 @@
+{
+  "ruleChain": {
+    "additionalInfo": {
+      "description": ""
+    },
+    "name": "Iris Classification",
+    "type": "CORE",
+    "firstRuleNodeId": null,
+    "root": false,
+    "debugMode": false,
+    "configuration": null
+  },
+  "metadata": {
+    "firstNodeIndex": 0,
+    "nodes": [
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 51,
+          "layoutY": 237
+        },
+        "type": "org.thingsboard.rule.engine.profile.TbDeviceProfileNode",
+        "name": "Input profile",
+        "debugMode": false,
+        "configuration": {
+          "persistAlarmRulesState": false,
+          "fetchAlarmRulesStateOnStart": false
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 52,
+          "layoutY": 337
+        },
+        "type": "org.thingsboard.rule.engine.filter.TbMsgTypeSwitchNode",
+        "name": "Message type switch",
+        "debugMode": false,
+        "configuration": {
+          "version": 0
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 346,
+          "layoutY": 151
+        },
+        "type": "org.thingsboard.rule.engine.transform.TbModelNode",
+        "name": "Iris model",
+        "debugMode": false,
+        "configuration": {
+          "resourceId": "a8ed5340-f570-11eb-ac4d-7d68eefecf90",
+          "inputNames": [
+            "input"
+          ],
+          "outputNames": [
+            "output"
+          ]
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 346,
+          "layoutY": 237
+        },
+        "type": "org.thingsboard.rule.engine.transform.TbTransformMsgNode",
+        "name": "output classification",
+        "debugMode": false,
+        "configuration": {
+          "jsScript": "var newMsg = {};\nvar outputdata = msg.output;\nvar data = nj.array(outputdata);\nvar a = data.shape[1];\n\nvar result = findIndex(data,a);\nnewMsg.iris_species = result[0];\nnewMsg.probability = result[1]*100;\n\nfunction findIndex(data, a) {\n    var index=0;\n    var maxi=data.get(0,0);\n    for (var i=0;i<a;i++) {\n        check = data.get(0,i);\n        if (maxi>=check) {maxi = maxi;}\n        else {\n            maxi = check;\n            index = i;\n        }\n    }\n    if (index == 0) {return [\"setosa\", maxi];}\n    if (index == 1) {return [\"versicolor\", maxi];}\n    else {return [\"virginica\", maxi];}\n}\nreturn {msg: newMsg, metadata: metadata, msgType: msgType};"
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 348,
+          "layoutY": 329
+        },
+        "type": "org.thingsboard.rule.engine.telemetry.TbMsgTimeseriesNode",
+        "name": "save",
+        "debugMode": false,
+        "configuration": {
+          "defaultTTL": 0
+        }
+      }
+    ],
+    "connections": [
+      {
+        "fromIndex": 0,
+        "toIndex": 1,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 1,
+        "toIndex": 2,
+        "type": "Post telemetry"
+      },
+      {
+        "fromIndex": 2,
+        "toIndex": 3,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 3,
+        "toIndex": 4,
+        "type": "Success"
+      }
+    ],
+    "ruleChainConnections": null
+  }
+}
