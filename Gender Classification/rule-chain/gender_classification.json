@@ -1,0 +1,151 @@
+{
+  "ruleChain": {
+    "additionalInfo": {
+      "description": ""
+    },
+    "name": "Gender Classification",
+    "type": "CORE",
+    "firstRuleNodeId": null,
+    "root": false,
+    "debugMode": false,
+    "configuration": null
+  },
+  "metadata": {
+    "firstNodeIndex": 0,
+    "nodes": [
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 49,
+          "layoutY": 236
+        },
+        "type": "org.thingsboard.rule.engine.profile.TbDeviceProfileNode",
+        "name": "Input profile",
+        "debugMode": false,
+        "configuration": {
+          "persistAlarmRulesState": false,
+          "fetchAlarmRulesStateOnStart": false
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 47,
+          "layoutY": 330
+        },
+        "type": "org.thingsboard.rule.engine.filter.TbMsgTypeSwitchNode",
+        "name": "Message type switch",
+        "debugMode": false,
+        "configuration": {
+          "version": 0
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 640,
+          "layoutY": 152
+        },
+        "type": "org.thingsboard.rule.engine.transform.TbImageToArrayNode",
+        "name": "image to array",
+        "debugMode": false,
+        "configuration": {
+          "inputNames": "image",
+          "outputNames": "input",
+          "ndArrayType": "FLOAT",
+          "width": 224,
+          "height": 224,
+          "includeMinibatchDim": true,
+          "aspectRatioHandling": "CENTER_CROP",
+          "ndFormat": "CHANNELS_FIRST",
+          "ndChannelLayout": "RGB",
+          "imageNormalizationType": "SCALE",
+          "listHandling": "NONE"
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 640,
+          "layoutY": 240
+        },
+        "type": "org.thingsboard.rule.engine.transform.TbModelNode",
+        "name": "gender googlenet",
+        "debugMode": false,
+        "configuration": {
+          "resourceId": "9b152750-eedd-11eb-a97d-9119bd10db3b",
+          "inputNames": [
+            "input"
+          ],
+          "outputNames": [
+            "loss3/loss3_Y"
+          ]
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 641,
+          "layoutY": 332
+        },
+        "type": "org.thingsboard.rule.engine.transform.TbTransformMsgNode",
+        "name": "output classification",
+        "debugMode": false,
+        "configuration": {
+          "jsScript": "var newMsg = {};\n\nvar output = msg[\"loss3/loss3_Y\"];\nvar data = nj.array(output);\nvar j = data.shape[1];\n\n\nvar result =  findIndex(data,j);\nnewMsg.Class = result[0];\nnewMsg.Probability = result[1]*100;\n\nfunction findIndex(data, j) {\n    var index=0;\n    var maxi=data.get(0,0);\n    \n    for (var i=0;i<j;i++) {\n        check = data.get(0,i);\n        if (maxi>=check) {\n            maxi = maxi;\n        }else {\n            maxi = check;\n            index = i;\n        }\n    }\n    if (index===0) {return [\"Male\", maxi];}\n    else {return [\"Female\", maxi];}\n}\n\nreturn {msg: newMsg, metadata: metadata, msgType: msgType};"
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 946,
+          "layoutY": 242
+        },
+        "type": "org.thingsboard.rule.engine.telemetry.TbMsgTimeseriesNode",
+        "name": "save",
+        "debugMode": false,
+        "configuration": {
+          "defaultTTL": 0
+        }
+      }
+    ],
+    "connections": [
+      {
+        "fromIndex": 0,
+        "toIndex": 1,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 1,
+        "toIndex": 2,
+        "type": "Post telemetry"
+      },
+      {
+        "fromIndex": 1,
+        "toIndex": 2,
+        "type": "RPC Request from Device"
+      },
+      {
+        "fromIndex": 2,
+        "toIndex": 3,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 3,
+        "toIndex": 4,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 3,
+        "toIndex": 5,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 4,
+        "toIndex": 5,
+        "type": "Success"
+      }
+    ],
+    "ruleChainConnections": null
+  }
+}
