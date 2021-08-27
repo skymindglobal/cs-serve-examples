@@ -1,0 +1,352 @@
+{
+  "ruleChain": {
+    "additionalInfo": {
+      "description": ""
+    },
+    "name": "Object Detection",
+    "type": "CORE",
+    "firstRuleNodeId": null,
+    "root": false,
+    "debugMode": false,
+    "configuration": null
+  },
+  "metadata": {
+    "firstNodeIndex": 9,
+    "nodes": [
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 317,
+          "layoutY": 303
+        },
+        "type": "org.thingsboard.rule.engine.transform.TbTransformMsgNode",
+        "name": "Image shape",
+        "debugMode": true,
+        "configuration": {
+          "jsScript": "msg.image = msg.image;\nmsg.image_shape = nj.array([[416,416]]);\n\nreturn {msg: msg, metadata: metadata, msgType: msgType};"
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 317,
+          "layoutY": 377
+        },
+        "type": "org.thingsboard.rule.engine.transform.TbImageToArrayNode",
+        "name": "Image to array",
+        "debugMode": true,
+        "configuration": {
+          "inputNames": "image",
+          "outputNames": "input_1",
+          "ndArrayType": "FLOAT",
+          "width": 416,
+          "height": 416,
+          "includeMinibatchDim": true,
+          "aspectRatioHandling": "CENTER_CROP",
+          "ndFormat": "CHANNELS_FIRST",
+          "ndChannelLayout": "RGB",
+          "imageNormalizationType": "SCALE",
+          "listHandling": "NONE"
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 316,
+          "layoutY": 453
+        },
+        "type": "org.thingsboard.rule.engine.transform.TbModelNode",
+        "name": "Model detection",
+        "debugMode": true,
+        "configuration": {
+          "resourceId": "4f1568d0-00b0-11ec-a82f-3bf3b059b474",
+          "inputNames": [
+            "input_1",
+            "image_shape"
+          ],
+          "outputNames": [
+            "yolonms_layer_1",
+            "yolonms_layer_1:1",
+            "yolonms_layer_1:2"
+          ]
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 314,
+          "layoutY": 527
+        },
+        "type": "org.thingsboard.rule.engine.transform.TbTransformMsgNode",
+        "name": "Counting & selecting bounding box",
+        "debugMode": true,
+        "configuration": {
+          "jsScript": "var newMsg = {};\n\nvar obj = {0:\"person\", 1:\"bicycle\", 2:\"car\", 3:\"motorbike\", 4:\"aeroplane\", 5:\"bus\", 6:\"train\", 7:\"truck\", 8:\"boat\", 9:\"traffic light\", 10:\"fire hydrant\", 11:\"stop sign\", 12:\"parking meter\", 13:\"bench\", 14:\"bird\", 15:\"cat\", 16:\"dog\", 17:\"horse\", 18:\"sheep\", 19:\"cow\", 20:\"elephant\", 21:\"bear\", 22:\"zebra\", 23:\"giraffe\", 24:\"backpack\", 25:\"umbrella\", 26:\"handbag\", 27:\"tie\", 28:\"suitcase\", 29:\"frisbee\", 30:\"skis\", 31:\"snowboard\", 32:\"sports ball\", 33:\"kite\", 34:\"baseball bat\", 35:\"baseball glove\", 36:\"skateboard\", 37:\"surfboard\", 38:\"tennis racket\", 39:\"bottle\", 40:\"wine glass\", 41:\"cup\", 42:\"fork\", 43:\"knife\", 44:\"spoon\", 45:\"bowl\", 46:\"banana\", 47:\"apple\", 48:\"sandwich\", 49:\"orange\", 50:\"broccoli\", 51:\"carrot\", 52:\"hot dog\", 53:\"pizza\", 54:\"donut\", 55:\"cake\", 56:\"chair\", 57:\"sofa\", 58:\"potted plant\", 59:\"bed\", 60:\"dining table\", 61:\"toilet\", 62:\"tv monitor\", 63:\"laptop\", 64:\"mouse\", 65:\"remote\", 66:\"keyboard\", 67:\"cell phone\", 68:\"microwave\", 69:\"oven\", 70:\"toaster\", 71:\"sink\", 72:\"refrigerator\", 73:\"book\", 74:\"clock\", 75:\"vase\", 76:\"scissors\", 77:\"teddy bear\", 78:\"hair drier\", 79:\"toothbrush\"};\n\nvar classes = msg[\"yolonms_layer_1:2\"];\nvar classes_arr = nj.array(classes);\nvar classes_len = classes_arr.shape[1];\nnum_classes_detected = classes_len/3;\nvar out_classes = classes_arr.reshape(1,num_classes_detected,3);\nnewMsg.classes_arr = out_classes;\n\nvar boxes = msg[\"yolonms_layer_1\"];\nvar boxes_arr = nj.array(boxes);\nvar boxes_len = boxes_arr.shape[1];\nnum_anchor_boxes = boxes_len/4;\nvar anchor_boxes_arr =  boxes_arr.reshape(1,num_anchor_boxes,4);\n\nvar scores = msg[\"yolonms_layer_1:1\"];\nvar scores_arr = nj.array(scores);\nvar scores_len = scores_arr.shape[1];\nnum_anchor_scores = scores_len/80;\nvar anchor_scores_arr = scores_arr.reshape(1,num_anchor_scores,80);\n\nvar numberofobjectdetected = 0;\nvar data = [];\nvar obj_person = 0;\nvar obj_bicycle = 0;\nvar obj_car = 0;\nfor (c = 0; c<num_classes_detected; c++) {\n    \n    var dict = {};\n    box_index = out_classes.get(0,c,2); //(0,varies,2)\n    class_index = out_classes.get(0,c,1);\n    score = anchor_scores_arr.get(0, box_index, class_index);\n    var top = anchor_boxes_arr.get(0,box_index,0);\n    var left = anchor_boxes_arr.get(0,box_index,1);\n    var bottom = anchor_boxes_arr.get(0,box_index,2);\n    var right = anchor_boxes_arr.get(0,box_index,3);\n    \n    dict['@x1'] = left/416;\n    dict['@y1'] = top/416;\n    dict['@x2'] = right/416;\n    dict['@y2'] = bottom/416;\n    dict.label = obj[class_index];\n    dict.probability = score;\n\n    data[numberofobjectdetected] = dict;\n    numberofobjectdetected++;\n    if (class_index===0) {obj_person++;}\n    if (class_index===1) {obj_bicycle++;}\n    if (class_index===2) {obj_car++;}\n}\n\nnewMsg.num_of_detected_obj = numberofobjectdetected;\nnewMsg.bbox = data;\nnewMsg.person = obj_person;\nnewMsg.bicycle = obj_bicycle;\nnewMsg.car = obj_car;\nnewMsg.image = msg.image;\nreturn {msg: newMsg, metadata: metadata, msgType: msgType};"
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 313,
+          "layoutY": 603
+        },
+        "type": "org.thingsboard.rule.engine.transform.TbDrawBoundingBoxesNode",
+        "name": "Draw bounding box",
+        "debugMode": true,
+        "configuration": {
+          "imageName": "image",
+          "bboxName": "bbox",
+          "drawLabel": false,
+          "drawProbability": false,
+          "classColors": {
+            "person": "blue",
+            "bicycle": "green",
+            "car": "red",
+            "motorbike": "white",
+            "aeroplane": "silver",
+            "bus": "gray",
+            "train": "black",
+            "truck": "maroon",
+            "boat": "yellow",
+            "traffic light": "olive",
+            "fire hydrant": "aqua",
+            "stop sign": "teal",
+            "parking meter": "navy",
+            "bench": "fuchsia",
+            "bird": "purple",
+            "cat": "rgb(102, 51, 153)",
+            "dog": "rgb(34, 139, 34)",
+            "horse": "rgb(72, 209, 204)",
+            "sheep": "rgb(95, 158, 160)",
+            "cow": "rgb(30, 144, 255)",
+            "elephant": "rgb(123, 104, 238)",
+            "bear": "rgb(0, 0, 139)",
+            "zebra": "rgb(160, 82, 45)",
+            "giraffe": "rgb(105, 105, 105)",
+            "backpack": "rgb(216, 191, 216)",
+            "umbrella": "rgb(70, 130, 180)",
+            "handbag": "rgb(255, 99, 71)",
+            "tie": "aqua",
+            "suitcase": "rgb(60, 179, 113)",
+            "frisbee": "rgb(176, 196, 222)",
+            "skis": "rgb(144, 238, 144)",
+            "snowboard": "rgb(139, 0, 139)",
+            "sports ball": "rgb(102, 205, 170)",
+            "kite": "rgb(0, 139, 139)",
+            "baseball bat": "rgb(210, 180, 140)",
+            "baseball glove": "rgb(139, 69, 19)",
+            "skateboard": "rgb(154, 205, 50)",
+            "surfboard": "rgb(221, 160, 221)",
+            "tennis racket": "rgb(0, 100, 0)",
+            "bottle": "rgb(176, 224, 230)",
+            "wine glass": "rgb(188, 143, 143)",
+            "cup": "rgb(75, 0, 130)",
+            "fork": "rgb(127, 255, 0)",
+            "knife": "rgb(244, 164, 96)",
+            "spoon": "rgb(47, 79, 79)",
+            "bowl": "rgb(135, 206, 250)",
+            "banana": "rgb(106, 90, 205)",
+            "apple": "rgb(184, 134, 11)",
+            "sandwich": "rgb(85, 107, 47)",
+            "orange": "rgb(210, 105, 30)",
+            "broccoli": "rgb(65, 105, 225)",
+            "carrot": "rgb(72, 61, 139)",
+            "hot dog": "rgb(119, 136, 153)",
+            "pizza": "rgb(25, 25, 112)",
+            "donut": "rgb(123, 104, 238)",
+            "cake": "rgb(222, 184, 135)",
+            "chair": "rgb(100, 149, 237)",
+            "sofa": "rgb(240, 230, 140)",
+            "potted plant": "rgb(143, 188, 139)",
+            "bed": "rgb(50, 205, 50)",
+            "dining table": "rgb(147, 112, 219)",
+            "toilet": "rgb(255, 228, 181)",
+            "tv monitor": "rgb(255, 165, 0)",
+            "laptop": "rgb(219, 112, 147)",
+            "mouse": "rgb(139, 0, 0)",
+            "remote": "rgb(255, 222, 173)",
+            "keyboard": "rgb(175, 238, 238)",
+            "cell phone": "rgb(238, 130, 238)",
+            "microwave": "rgb(255, 250, 205)",
+            "oven": "rgb(255, 69, 0)",
+            "toaster": "rgb(255, 20, 147)",
+            "sink": "rgb(233, 150, 122)",
+            "refrigerator": "rgb(220, 220, 220)",
+            "book": "rgb(255, 248, 220)",
+            "clock": "rgb(173, 255, 47)",
+            "vase": "rgb(230, 230, 250)",
+            "scissors": "rgb(255, 215, 0)",
+            "teddy bear": "rgb(255, 160, 122)",
+            "hair drier": "rgb(255, 192, 203)",
+            "toothbrush": "rgb(205, 92, 92)"
+          },
+          "color": "lime",
+          "lineThickness": 1,
+          "scale": "NONE",
+          "resizeH": 100,
+          "resizeW": 100,
+          "drawCropRegion": false,
+          "cropRegionColor": "purple",
+          "ndArrayType": "FLOAT",
+          "width": null,
+          "height": null,
+          "includeMinibatchDim": true,
+          "aspectRatioHandling": "CENTER_CROP",
+          "ndFormat": "CHANNELS_FIRST",
+          "ndChannelLayout": "RGB",
+          "imageNormalizationType": "SCALE",
+          "listHandling": "NONE"
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 612,
+          "layoutY": 605
+        },
+        "type": "org.thingsboard.rule.engine.telemetry.TbMsgTimeseriesNode",
+        "name": "Save prediction to database",
+        "debugMode": true,
+        "configuration": {
+          "defaultTTL": 0
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 885,
+          "layoutY": 525
+        },
+        "type": "org.thingsboard.rule.engine.metadata.TbGetTelemetryNode",
+        "name": "Collect 30s interval data",
+        "debugMode": true,
+        "configuration": {
+          "latestTsKeyNames": [
+            "num_of_detected_obj"
+          ],
+          "fetchMode": "ALL",
+          "orderBy": "DESC",
+          "limit": 1000,
+          "useMetadataIntervalPatterns": false,
+          "startInterval": 30,
+          "startIntervalTimeUnit": "SECONDS",
+          "endInterval": 1,
+          "endIntervalTimeUnit": "MILLISECONDS",
+          "startIntervalPattern": "",
+          "endIntervalPattern": ""
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 886,
+          "layoutY": 604
+        },
+        "type": "org.thingsboard.rule.engine.transform.TbTransformMsgNode",
+        "name": "Sum of object",
+        "debugMode": true,
+        "configuration": {
+          "jsScript": "var newMsg = {};\nvar detectedObjArray = JSON.parse(metadata.num_of_detected_obj);\nvar total = 0;\nfor (var i=0; i < detectedObjArray.length; i++) {\n    total += detectedObjArray[i].value;\n}\nnewMsg.total_object_detected_in_30s = total;\nreturn {msg: newMsg, metadata: metadata, msgType: msgType};"
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 887,
+          "layoutY": 684
+        },
+        "type": "org.thingsboard.rule.engine.telemetry.TbMsgTimeseriesNode",
+        "name": "Save summation to database",
+        "debugMode": false,
+        "configuration": {
+          "defaultTTL": 0
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 317,
+          "layoutY": 150
+        },
+        "type": "org.thingsboard.rule.engine.profile.TbDeviceProfileNode",
+        "name": "Input  profile",
+        "debugMode": true,
+        "configuration": {
+          "persistAlarmRulesState": false,
+          "fetchAlarmRulesStateOnStart": false
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 315,
+          "layoutY": 226
+        },
+        "type": "org.thingsboard.rule.engine.filter.TbMsgTypeSwitchNode",
+        "name": "Message type switch",
+        "debugMode": true,
+        "configuration": {
+          "version": 0
+        }
+      }
+    ],
+    "connections": [
+      {
+        "fromIndex": 0,
+        "toIndex": 1,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 1,
+        "toIndex": 2,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 2,
+        "toIndex": 3,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 3,
+        "toIndex": 4,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 3,
+        "toIndex": 5,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 3,
+        "toIndex": 6,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 4,
+        "toIndex": 5,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 6,
+        "toIndex": 7,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 7,
+        "toIndex": 8,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 9,
+        "toIndex": 10,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 10,
+        "toIndex": 0,
+        "type": "Post telemetry"
+      }
+    ],
+    "ruleChainConnections": null
+  }
+}
