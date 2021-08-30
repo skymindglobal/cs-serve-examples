@@ -6,8 +6,8 @@ https://drive.google.com/file/d/1-MBxj7RUeKnVin0rcg0HL5FdrYwxlpUN/view?usp=shari
 
 Model's Layers Properties
 
-Layers | Name
------- | ----
+Layers | Names
+------ | -----
 Inputs | input
 Outputs | boxes, scores
 
