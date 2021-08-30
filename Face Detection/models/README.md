@@ -1,4 +1,4 @@
-# Example of CS.Serve - Face Detection 
+# Model File - Example for Face Detection
 
 Click the link below to download the model for face detection example:
 
