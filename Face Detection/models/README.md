@@ -11,4 +11,4 @@ Layers | Names
 Inputs | input
 Outputs | boxes, scores
 
-You can check the model properties in https://netron.app/, drag and drop the model to the application!
+:heavy_check_mark: You can check the model properties in https://netron.app/, drag and drop the model to the application!
