@@ -4,7 +4,7 @@ Click the link below to download the model for object detection example:
 
 1. TinyYOLO[v3]:
 
-https://drive.google.com/file/d/1et0MgOeAAPxx87MMpg9VVcKQgaWqfjQ-/view?usp=sharing
+:link: https://drive.google.com/file/d/1et0MgOeAAPxx87MMpg9VVcKQgaWqfjQ-/view?usp=sharing
 
 Model's Layers Properties:
 
@@ -16,7 +16,7 @@ Outputs | yolonms_layer_1, yolonms_layer_1:1, yolonms_layer_1:2
 
 2. YOLO[v3]:
 
-https://drive.google.com/file/d/1_2cUtnV8cLvQdhqiD8ZnVGisOUKyWBUM/view?usp=sharing
+:link: https://drive.google.com/file/d/1_2cUtnV8cLvQdhqiD8ZnVGisOUKyWBUM/view?usp=sharing
 
 Model's Layers Properties:
 
