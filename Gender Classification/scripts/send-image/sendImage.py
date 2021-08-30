@@ -10,7 +10,7 @@ from random import randint               # generate random
 
 
 def main():
-    url = f'https://cs.hyperlinx.ai/api/v1/{sys.argv[1]}/telemetry'         # URL of CS.Serve
+    url = f'https://cs.hyperlinx.ai/api/v1/{sys.argv[1]}/telemetry'         # Serve URL
     image_root = './../../images/'                                          # root directory of images
     # Generate random and post the images until completed
     for i in range(6):

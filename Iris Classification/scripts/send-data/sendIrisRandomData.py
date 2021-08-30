@@ -10,7 +10,7 @@ from datetime import datetime            # use for current sending time
 
 
 def main():
-    url = f'https://cs.hyperlinx.ai/api/v1/{sys.argv[1]}/telemetry'             # URL of CS.Serve
+    url = f'https://cs.hyperlinx.ai/api/v1/{sys.argv[1]}/telemetry'             # Serve Url
     irisdata = pd.read_csv("./../../data/Iris.csv", header=0, index_col='Id')   # read data from source directory
     # Generate random and post the data until completed
     for i in range(10):

@@ -16,7 +16,7 @@ def main():
     url = f'https://cs.hyperlinx.ai/api/v1/{sys.argv[1]}/telemetry'
     cap = cv2.VideoCapture(sys.argv[2])  # use cv2.VideoCapture(0) for webcam footage
     count = 0                            # count for every frame
-    count_sent = 0                       # count for every frame sent to CS.Serve
+    count_sent = 0                       # count for every frame sent to the server
     # Get original size
     frame_width = int(cap.get(3))
     frame_height = int(cap.get(4))
@@ -36,7 +36,7 @@ def main():
             files = {'image': ('image.png', open('image.png', 'rb'), 'image/png')}          # open image file
             if count % skip_frames == 0:                                                    # logic to skip frame
                 # time.sleep(3)                                                             # uncomment if need delay
-                requests.post(url, files=files)                                             # post image to CS.Serve
+                requests.post(url, files=files)                                             # post image to serve
                 print(datetime.now().strftime("%d/%m/%Y %H:%M:%S"), " Sending image...")    # print post time
                 count_sent += 1
             count += 1
