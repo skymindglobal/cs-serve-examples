@@ -8,7 +8,7 @@ Model's Layers Properties:
 
 Layers | Names
 ------ | -----
-Inputs | input
+Input | input
 Output | output
 
 ✔️ You can check the model properties in https://netron.app/, drag and drop the model to the application!
