@@ -1,0 +1,156 @@
+{
+  "ruleChain": {
+    "additionalInfo": {
+      "description": "Rule chain for speech recognition"
+    },
+    "name": "Speech Recognition",
+    "type": "CORE",
+    "firstRuleNodeId": null,
+    "root": false,
+    "debugMode": true,
+    "configuration": null
+  },
+  "metadata": {
+    "firstNodeIndex": 0,
+    "nodes": [
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 50,
+          "layoutY": 217
+        },
+        "type": "org.thingsboard.rule.engine.profile.TbDeviceProfileNode",
+        "name": "input profile",
+        "debugMode": false,
+        "configuration": {
+          "persistAlarmRulesState": false,
+          "fetchAlarmRulesStateOnStart": false
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 51,
+          "layoutY": 297
+        },
+        "type": "org.thingsboard.rule.engine.filter.TbMsgTypeSwitchNode",
+        "name": "message type switch",
+        "debugMode": false,
+        "configuration": {
+          "version": 0
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 331,
+          "layoutY": 98
+        },
+        "type": "org.thingsboard.rule.engine.transform.TbTransformMsgNode",
+        "name": "input pre-process",
+        "debugMode": true,
+        "configuration": {
+          "jsScript": "msg.input = [msg.input];\nreturn {msg: msg, metadata: metadata, msgType: msgType};"
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 329,
+          "layoutY": 389
+        },
+        "type": "org.thingsboard.rule.engine.transform.TbTransformMsgNode",
+        "name": "output post-process",
+        "debugMode": true,
+        "configuration": {
+          "jsScript": "var probabilities = msg.output[0];\nfunction listToMatrix(list, elementsPerSubArray) {\n    var matrix = [], i, k;\n    for (i = 0, k = -1; i < list.length; i++) {\n        if (i % elementsPerSubArray === 0) {\n            k++;\n            matrix[k] = [];\n        }\n        matrix[k].push(list[i]);\n    }\n    return matrix;\n}\nvar probabilities_matrix;\nprobabilities_matrix = listToMatrix(probabilities,999);\nvar frames = probabilities_matrix.length;\nfunction indexOfMax(arr) {\n    if (arr.length === 0) {\n        return -1;\n    }\n    var max = arr[0];\n    var maxIndex = 0;\n    for (var i = 1; i < arr.length; i++) {\n        if (arr[i] > max) {\n            maxIndex = i;\n            max = arr[i];\n        }\n    }\n    return maxIndex;\n}\nvar dict = {\n  0: \"_\",\n  1: \"th\", \n  2: \"the\", \n  3: \"in\", \n  4: \"an\", \n  5: \"re\", \n  6: \"er\", \n  7: \"on\", \n  8: \"at\", \n  9: \"ou\", \n  10: \"is\", \n  11: \"en\", \n  12: \"to\", \n  13: \"and\", \n  14: \"ed\", \n  15: \"al\", \n  16: \"as\", \n  17: \"it\", \n  18: \"ing\", \n  19: \"or\", \n  20: \"of\", \n  21: \"es\", \n  22: \"ar\", \n  23: \"he\", \n  24: \"le\", \n  25: \"st\", \n  26: \"se\", \n  27: \"om\", \n  28: \"ic\", \n  29: \"be\", \n  30: \"we\", \n  31: \"ly\", \n  32: \"that\", \n  33: \"no\", \n  34: \"wh\", \n  35: \"ve\", \n  36: \"ha\", \n  37: \"you\", \n  38: \"ch\", \n  39: \"ion\", \n  40: \"il\", \n  41: \"ent\", \n  42: \"ro\", \n  43: \"me\", \n  44: \"id\", \n  45: \"ac\", \n  46: \"gh\", \n  47: \"for\", \n  48: \"was\", \n  49: \"lo\", \n  50: \"ver\", \n  51: \"ut\", \n  52: \"li\", \n  53: \"ld\", \n  54: \"ay\", \n  55: \"ad\", \n  56: \"so\", \n  57: \"ir\", \n  58: \"im\", \n  59: \"un\", \n  60: \"wi\", \n  61: \"ter\", \n  62: \"are\", \n  63: \"with\", \n  64: \"ke\", \n  65: \"ge\", \n  66: \"do\", \n  67: \"ur\", \n  68: \"all\", \n  69: \"ce\", \n  70: \"ab\", \n  71: \"mo\", \n  72: \"go\", \n  73: \"pe\", \n  74: \"ne\", \n  75: \"this\", \n  76: \"ri\", \n  77: \"ght\", \n  78: \"de\", \n  79: \"one\", \n  80: \"us\", \n  81: \"am\", \n  82: \"out\", \n  83: \"fe\", \n  84: \"but\", \n  85: \"po\", \n  86: \"his\", \n  87: \"te\", \n  88: \"ho\", \n  89: \"ther\", \n  90: \"not\", \n  91: \"con\", \n  92: \"com\", \n  93: \"ll\", \n  94: \"they\", \n  95: \"if\", \n  96: \"ould\", \n  97: \"su\", \n  98: \"have\",\n  99: \"ct\",\n  100: \"ain\", \n  101: \"our\", \n  102: \"ation\", \n  103: \"fr\", \n  104: \"ill\", \n  105: \"now\", \n  106: \"sa\", \n  107: \"had\", \n  108: \"tr\", \n  109: \"her\", \n  110: \"per\", \n  111: \"ant\", \n  112: \"oun\", \n  113: \"my\", \n  114: \"ul\", \n  115: \"ca\", \n  116: \"by\", \n  117: \"what\", \n  118: \"red\", \n  119: \"res\", \n  120: \"od\", \n  121: \"ome\", \n  122: \"ess\", \n  123: \"man\", \n  124: \"ex\", \n  125: \"she\", \n  126: \"pl\", \n  127: \"co\", \n  128: \"wor\", \n  129: \"pro\", \n  130: \"up\", \n  131: \"thing\", \n  132: \"there\", \n  133: \"ple\", \n  134: \"ag\", \n  135: \"can\", \n  136: \"qu\", \n  137: \"art\", \n  138: \"ally\", \n  139: \"ok\", \n  140: \"from\", \n  141: \"ust\", \n  142: \"very\", \n  143: \"sh\", \n  144: \"ind\", \n  145: \"est\", \n  146: \"some\", \n  147: \"ate\", \n  148: \"wn\", \n  149: \"ti\", \n  150: \"fo\", \n  151: \"ard\", \n  152: \"ap\", \n  153: \"him\", \n  154: \"were\", \n  155: \"ich\", \n  156: \"here\", \n  157: \"bo\", \n  158: \"ity\", \n  159: \"um\", \n  160: \"ive\", \n  161: \"ous\", \n  162: \"way\", \n  163: \"end\", \n  164: \"ig\", \n  165: \"pr\", \n  166: \"which\", \n  167: \"ma\", \n  168: \"ist\", \n  169: \"them\", \n  170: \"like\", \n  171: \"who\", \n  172: \"ers\", \n  173: \"when\", \n  174: \"act\", \n  175: \"use\", \n  176: \"about\", \n  177: \"ound\", \n  178: \"gr\", \n  179: \"et\", \n  180: \"ide\", \n  181: \"ight\", \n  182: \"ast\", \n  183: \"king\", \n  184: \"would\", \n  185: \"ci\", \n  186: \"their\", \n  187: \"other\", \n  188: \"see\", \n  189: \"ment\", \n  190: \"ong\", \n  191: \"wo\", \n  192: \"ven\", \n  193: \"know\", \n  194: \"how\", \n  195: \"said\", \n  196: \"ine\", \n  197: \"ure\", \n  198: \"more\", \n  199: \"der\", \n  200: \"sel\", \n  201: \"br\", \n  202: \"ren\", \n  203: \"ack\", \n  204: \"ol\", \n  205: \"ta\", \n  206: \"low\", \n  207: \"ough\", \n  208: \"then\", \n  209: \"peo\", \n  210: \"ye\", \n  211: \"ace\", \n  212: \"people\", \n  213: \"ink\", \n  214: \"ort\", \n  215: \"your\", \n  216: \"will\", \n  217: \"than\", \n  218: \"pp\", \n  219: \"any\", \n  220: \"ish\", \n  221: \"look\", \n  222: \"la\", \n  223: \"just\", \n  224: \"tor\", \n  225: \"ice\", \n  226: \"itt\", \n  227: \"af\", \n  228: \"these\", \n  229: \"sp\", \n  230: \"has\", \n  231: \"gre\", \n  232: \"been\", \n  233: \"ty\", \n  234: \"ies\", \n  235: \"ie\", \n  236: \"get\", \n  237: \"able\", \n  238: \"day\", \n  239: \"could\", \n  240: \"bl\", \n  241: \"two\", \n  242: \"time\", \n  243: \"beca\", \n  244: \"into\", \n  245: \"age\", \n  246: \"ans\", \n  247: \"mis\", \n  248: \"new\", \n  249: \"ree\", \n  250: \"ble\", \n  251: \"ite\", \n  252: \"si\", \n  253: \"urn\", \n  254: \"ass\", \n  255: \"cl\", \n  256: \"ber\", \n  257: \"str\", \n  258: \"think\", \n  259: \"dis\", \n  260: \"mar\", \n  261: \"ence\", \n  262: \"pt\", \n  263: \"self\", \n  264: \"ated\", \n  265: \"did\", \n  266: \"el\", \n  267: \"don\", \n  268: \"ck\", \n  269: \"ph\", \n  270: \"ars\", \n  271: \"ach\", \n  272: \"fore\", \n  273: \"its\", \n  274: \"part\", \n  275: \"ang\", \n  276: \"cre\", \n  277: \"well\", \n  278: \"ions\", \n  279: \"where\", \n  280: \"ves\", \n  281: \"ved\", \n  282: \"em\", \n  283: \"good\", \n  284: \"because\", \n  285: \"over\", \n  286: \"ud\", \n  287: \"ts\", \n  288: \"off\", \n  289: \"turn\", \n  290: \"cr\", \n  291: \"right\", \n  292: \"ress\", \n  293: \"most\", \n  294: \"every\", \n  295: \"pre\", \n  296: \"fa\", \n  297: \"fir\", \n  298: \"ild\", \n  299: \"pos\", \n  300: \"down\", \n  301: \"work\", \n  302: \"ade\", \n  303: \"say\", \n  304: \"med\", \n  305: \"also\", \n  306: \"litt\", \n  307: \"little\", \n  308: \"ance\", \n  309: \"come\", \n  310: \"ving\", \n  311: \"only\", \n  312: \"ful\", \n  313: \"ought\", \n  314: \"want\", \n  315: \"going\", \n  316: \"spe\", \n  317: \"ps\", \n  318: \"ater\", \n  319: \"first\", \n  320: \"after\", \n  321: \"ue\", \n  322: \"ose\", \n  323: \"mu\", \n  324: \"iz\", \n  325: \"ire\", \n  326: \"int\", \n  327: \"rest\", \n  328: \"ser\", \n  329: \"coun\", \n  330: \"des\", \n  331: \"light\", \n  332: \"son\", \n  333: \"let\", \n  334: \"ical\", \n  335: \"ick\", \n  336: \"ra\", \n  337: \"back\", \n  338: \"mon\", \n  339: \"ase\", \n  340: \"ign\", \n  341: \"ep\", \n  342: \"world\", \n  343: \"may\", \n  344: \"read\", \n  345: \"form\", \n  346: \"much\", \n  347: \"even\", \n  348: \"should\", \n  349: \"again\", \n  350: \"make\", \n  351: \"long\", \n  352: \"sto\", \n  353: \"cont\", \n  354: \"put\", \n  355: \"thr\", \n  356: \"under\", \n  357: \"cor\", \n  358: \"bet\", \n  359: \"jo\", \n  360: \"car\", \n  361: \"ile\", \n  362: \"went\", \n  363: \"yes\", \n  364: \"ually\", \n  365: \"row\", \n  366: \"hand\", \n  367: \"ak\", \n  368: \"call\", \n  369: \"ary\", \n  370: \"ia\", \n  371: \"many\", \n  372: \"cho\", \n  373: \"things\", \n  374: \"try\", \n  375: \"gl\", \n  376: \"ens\", \n  377: \"really\", \n  378: \"happ\", \n  379: \"great\", \n  380: \"dif\", \n  381: \"bu\", \n  382: \"hi\", \n  383: \"made\", \n  384: \"room\", \n  385: \"ange\", \n  386: \"cent\", \n  387: \"ious\", \n  388: \"je\", \n  389: \"three\", \n  390: \"ward\", \n  391: \"op\", \n  392: \"gen\", \n  393: \"those\", \n  394: \"life\", \n  395: \"tal\", \n  396: \"pa\", \n  397: \"through\", \n  398: \"und\", \n  399: \"cess\", \n  400: \"before\", \n  401: \"du\", \n  402: \"side\", \n  403: \"need\", \n  404: \"less\", \n  405: \"inter\", \n  406: \"ting\", \n  407: \"ry\", \n  408: \"ise\", \n  409: \"na\", \n  410: \"men\", \n  411: \"ave\", \n  412: \"fl\", \n  413: \"ction\", \n  414: \"pres\", \n  415: \"old\", \n  416: \"something\", \n  417: \"miss\", \n  418: \"never\", \n  419: \"got\", \n  420: \"feren\", \n  421: \"imp\", \n  422: \"sy\", \n  423: \"ations\", \n  424: \"tain\", \n  425: \"ning\", \n  426: \"ked\", \n  427: \"sm\", \n  428: \"take\", \n  429: \"ten\", \n  430: \"ted\", \n  431: \"ip\", \n  432: \"col\", \n  433: \"own\", \n  434: \"stand\", \n  435: \"add\", \n  436: \"min\", \n  437: \"wer\", \n  438: \"ms\", \n  439: \"ces\", \n  440: \"gu\", \n  441: \"land\", \n  442: \"bod\", \n  443: \"log\", \n  444: \"cour\", \n  445: \"ob\", \n  446: \"vo\", \n  447: \"ition\", \n  448: \"hu\", \n  449: \"came\", \n  450: \"comp\", \n  451: \"cur\", \n  452: \"being\", \n  453: \"comm\", \n  454: \"years\", \n  455: \"ily\", \n  456: \"wom\", \n  457: \"cer\", \n  458: \"kind\", \n  459: \"thought\", \n  460: \"such\", \n  461: \"tell\", \n  462: \"child\", \n  463: \"nor\", \n  464: \"bro\", \n  465: \"ial\", \n  466: \"pu\", \n  467: \"does\", \n  468: \"head\", \n  469: \"clo\", \n  470: \"ear\", \n  471: \"led\", \n  472: \"llow\", \n  473: \"ste\", \n  474: \"ness\", \n  475: \"too\", \n  476: \"start\", \n  477: \"mor\", \n  478: \"used\", \n  479: \"par\", \n  480: \"play\", \n  481: \"ents\", \n  482: \"tri\", \n  483: \"upon\", \n  484: \"tim\", \n  485: \"num\", \n  486: \"ds\", \n  487: \"ever\", \n  488: \"cle\", \n  489: \"ef\", \n  490: \"wr\", \n  491: \"vis\", \n  492: \"ian\", \n  493: \"sur\", \n  494: \"same\", \n  495: \"might\", \n  496: \"fin\", \n  497: \"differen\", \n  498: \"sho\", \n  499: \"why\",\n  500: \"body\", \n  501: \"mat\", \n  502: \"beg\", \n  503: \"vers\", \n  504: \"ouse\", \n  505: \"actually\", \n  506: \"ft\", \n  507: \"ath\", \n  508: \"hel\", \n  509: \"sha\", \n  510: \"ating\", \n  511: \"ual\", \n  512: \"found\", \n  513: \"ways\", \n  514: \"must\", \n  515: \"four\", \n  516: \"gi\", \n  517: \"val\", \n  518: \"di\", \n  519: \"tre\", \n  520: \"still\", \n  521: \"tory\", \n  522: \"ates\", \n  523: \"high\", \n  524: \"set\", \n  525: \"care\", \n  526: \"ced\", \n  527: \"last\", \n  528: \"find\", \n  529: \"au\", \n  530: \"inte\", \n  531: \"ev\", \n  532: \"ger\", \n  533: \"thank\", \n  534: \"ss\", \n  535: \"ict\", \n  536: \"ton\", \n  537: \"cal\", \n  538: \"nat\", \n  539: \"les\", \n  540: \"bed\", \n  541: \"away\", \n  542: \"place\", \n  543: \"house\", \n  544: \"che\", \n  545: \"ject\", \n  546: \"sol\", \n  547: \"another\", \n  548: \"ited\", \n  549: \"att\", \n  550: \"face\", \n  551: \"show\", \n  552: \"ner\", \n  553: \"ken\", \n  554: \"far\", \n  555: \"ys\", \n  556: \"lect\", \n  557: \"lie\", \n  558: \"tem\", \n  559: \"ened\", \n  560: \"night\", \n  561: \"while\", \n  562: \"looking\", \n  563: \"ah\", \n  564: \"wal\", \n  565: \"dr\", \n  566: \"real\", \n  567: \"cha\", \n  568: \"exp\", \n  569: \"war\", \n  570: \"five\", \n  571: \"pol\", \n  572: \"fri\", \n  573: \"wa\", \n  574: \"cy\", \n  575: \"fect\", \n  576: \"xt\", \n  577: \"left\", \n  578: \"give\", \n  579: \"soci\", \n  580: \"cond\", \n  581: \"char\", \n  582: \"bor\", \n  583: \"point\", \n  584: \"number\", \n  585: \"mister\", \n  586: \"called\", \n  587: \"six\", \n  588: \"bre\", \n  589: \"vi\", \n  590: \"without\", \n  591: \"person\", \n  592: \"air\", \n  593: \"different\", \n  594: \"lot\", \n  595: \"bit\", \n  596: \"pass\", \n  597: \"ular\", \n  598: \"youn\", \n  599: \"won\", \n  600: \"main\", \n  601: \"cri\", \n  602: \"ings\", \n  603: \"den\", \n  604: \"water\", \n  605: \"human\", \n  606: \"around\", \n  607: \"quest\", \n  608: \"ters\", \n  609: \"ities\", \n  610: \"feel\", \n  611: \"each\", \n  612: \"friend\", \n  613: \"sub\", \n  614: \"though\", \n  615: \"saw\", \n  616: \"ks\", \n  617: \"hund\", \n  618: \"hundred\", \n  619: \"times\", \n  620: \"lar\", \n  621: \"ff\", \n  622: \"amer\", \n  623: \"scho\", \n  624: \"sci\", \n  625: \"ors\", \n  626: \"lt\", \n  627: \"arch\", \n  628: \"fact\", \n  629: \"hal\", \n  630: \"himself\", \n  631: \"gener\", \n  632: \"mean\", \n  633: \"vol\", \n  634: \"school\", \n  635: \"ason\", \n  636: \"fam\", \n  637: \"ult\", \n  638: \"mind\", \n  639: \"itch\", \n  640: \"ped\", \n  641: \"home\", \n  642: \"young\", \n  643: \"took\", \n  644: \"big\", \n  645: \"love\", \n  646: \"reg\", \n  647: \"eng\", \n  648: \"sure\", \n  649: \"vent\", \n  650: \"ls\", \n  651: \"ot\", \n  652: \"ince\", \n  653: \"thous\", \n  654: \"eight\", \n  655: \"thousand\", \n  656: \"better\", \n  657: \"mom\", \n  658: \"appe\", \n  659: \"once\", \n  660: \"ied\", \n  661: \"mus\", \n  662: \"stem\", \n  663: \"sing\", \n  664: \"ident\", \n  665: \"als\", \n  666: \"uh\", \n  667: \"mem\", \n  668: \"produ\", \n  669: \"stud\", \n  670: \"power\", \n  671: \"atch\", \n  672: \"bas\", \n  673: \"father\", \n  674: \"av\", \n  675: \"nothing\", \n  676: \"gir\", \n  677: \"pect\", \n  678: \"unt\", \n  679: \"few\", \n  680: \"kes\", \n  681: \"eyes\", \n  682: \"sk\", \n  683: \"always\", \n  684: \"ared\", \n  685: \"toge\", \n  686: \"stru\", \n  687: \"together\", \n  688: \"ics\", \n  689: \"bus\", \n  690: \"fort\", \n  691: \"ween\", \n  692: \"rep\", \n  693: \"ically\", \n  694: \"small\", \n  695: \"ga\", \n  696: \"mer\", \n  697: \"ned\", \n  698: \"ins\", \n  699: \"between\",\n  700: \"yet\", \n  701: \"stre\", \n  702: \"hard\", \n  703: \"system\", \n  704: \"course\", \n  705: \"year\", \n  706: \"cept\", \n  707: \"publ\", \n  708: \"sim\", \n  709: \"sou\", \n  710: \"ready\", \n  711: \"follow\", \n  712: \"present\", \n  713: \"rel\", \n  714: \"turned\", \n  715: \"sw\", \n  716: \"possi\", \n  717: \"mother\", \n  718: \"io\", \n  719: \"bar\", \n  720: \"ished\", \n  721: \"dec\", \n  722: \"ments\", \n  723: \"pri\", \n  724:\"next\", \n  725: \"ross\", \n  726: \"both\", \n  727: \"ship\", \n  728: \"ures\", \n  729: \"americ\", \n  730: \"eas\", \n  731: \"asked\", \n  732: \"iness\", \n  733: \"serv\", \n  734: \"ists\", \n  735: \"ash\", \n  736: \"uni\", \n  737: \"build\", \n  738: \"phone\", \n  739: \"lau\", \n  740: \"ctor\", \n  741: \"belie\", \n  742: \"change\", \n  743: \"interest\", \n  744: \"peri\", \n  745: \"children\", \n  746: \"thir\", \n  747: \"lear\", \n  748: \"plan\", \n  749: \"import\", \n  750: \"ational\", \n  751: \"har\", \n  752: \"ines\", \n  753: \"dist\", \n  754: \"selves\", \n  755: \"city\", \n  756: \"sen\", \n  757: \"run\", \n  758: \"law\", \n  759: \"ghter\", \n  760: \"proble\", \n  761: \"woman\", \n  762: \"done\", \n  763: \"heart\", \n  764: \"book\", \n  765: \"aut\", \n  766: \"ris\", \n  767: \"lim\", \n  768: \"looked\", \n  769: \"vid\", \n  770: \"fu\", \n  771: \"bab\", \n  772: \"ately\", \n  773: \"ord\", \n  774: \"ket\", \n  775: \"oc\", \n  776: \"doing\", \n  777: \"area\", \n  778: \"tech\", \n  779: \"win\", \n  780: \"name\", \n  781: \"second\", \n  782: \"certain\", \n  783: \"pat\", \n  784: \"lad\", \n  785: \"quite\", \n  786: \"told\", \n  787: \"ific\", \n  788: \"ative\", \n  789: \"uring\", \n  790: \"gg\", \n  791: \"half\", \n  792: \"reason\", \n  793: \"moment\", \n  794: \"ility\", \n  795: \"ution\", \n  796: \"shall\", \n  797: \"aur\", \n  798: \"enough\", \n  799: \"idea\", \n  800: \"open\", \n  801: \"understand\", \n  802: \"vie\", \n  803: \"contin\", \n  804: \"mal\", \n  805: \"hor\", \n  806: \"qui\", \n  807: \"address\", \n  808: \"heard\", \n  809: \"help\", \n  810: \"inst\", \n  811: \"oney\", \n  812: \"whole\", \n  813: \"gover\", \n  814: \"commun\", \n  815: \"exam\", \n  816: \"near\", \n  817: \"didn\", \n  818: \"logy\", \n  819: \"oh\", \n  820: \"tru\", \n  821: \"lang\", \n  822: \"restaur\", \n  823: \"restaurant\", \n  824: \"design\", \n  825: \"ze\", \n  826: \"talk\", \n  827: \"leg\", \n  828: \"line\", \n  829: \"ank\", \n  830: \"ond\", \n  831: \"country\", \n  832: \"ute\", \n  833: \"howe\", \n  834: \"hold\", \n  835: \"live\", \n  836: \"comple\", \n  837: \"however\", \n  838: \"ized\", \n  839: \"ush\", \n  840: \"seen\", \n  841: \"bye\", \n  842: \"fer\", \n  843: \"ital\", \n  844: \"women\", \n  845: \"net\", \n  846: \"state\", \n  847: \"bur\", \n  848: \"fac\", \n  849: \"whe\", \n  850: \"important\", \n  851: \"dar\", \n  852: \"nine\", \n  853: \"sat\", \n  854: \"fic\", \n  855: \"known\", \n  856: \"having\", \n  857: \"against\", \n  858: \"soon\", \n  859: \"ety\", \n  860: \"langu\", \n  861: \"public\", \n  862: \"sil\", \n  863: \"best\", \n  864: \"az\", \n  865: \"knew\", \n  866:\"black\", \n  867: \"velo\", \n  868: \"sort\", \n  869: \"seven\", \n  870: \"imag\", \n  871: \"lead\", \n  872: \"cap\", \n  873: \"ask\", \n  874: \"alth\", \n  875: \"ature\", \n  876: \"nam\", \n  877: \"began\", \n  878: \"white\", \n  879: \"sent\", \n  880: \"sound\", \n  881: \"vir\", \n  882: \"days\", \n  883: \"anything\", \n  884: \"yeah\", \n  885: \"ub\", \n  886: \"blo\", \n  887: \"sun\", \n  888: \"story\", \n  889: \"dire\", \n  890: \"money\", \n  891: \"trans\", \n  892: \"mil\", \n  893: \"org\", \n  894: \"grow\", \n  895: \"cord\", \n  896: \"pped\", \n  897: \"cus\", \n  898: \"spo\", \n  899: \"sign\",\n  900: \"beaut\", \n  901: \"goodbye\", \n  902: \"inde\", \n  903: \"large\", \n  904: \"question\", \n  905: \"often\", \n  906: \"hour\", \n  907: \"que\", \n  908: \"pur\", \n  909: \"town\", \n  910: \"ield\", \n  911: \"coming\", \n  912: \"door\", \n  913: \"lig\", \n  914: \"ling\", \n  915: \"incl\", \n  916: \"partic\", \n  917: \"keep\", \n  918: \"engl\", \n  919: \"move\", \n  920: \"later\", \n  921: \"ants\", \n  922: \"food\", \n  923: \"lights\", \n  924: \"bal\", \n  925: \"words\", \n  926: \"list\", \n  927: \"aw\", \n  928: \"allow\", \n  929: \"aren\", \n  930: \"pret\", \n  931: \"tern\", \n  932: \"today\", \n  933: \"believe\", \n  934: \"almost\", \n  935: \"bir\", \n  936: \"word\", \n  937: \"possible\", \n  938: \"ither\", \n  939: \"case\", \n  940: \"ried\", \n  941: \"ural\", \n  942: \"round\", \n  943: \"twent\", \n  944: \"develo\", \n  945: \"plain\", \n  946: \"ended\", \n  947: \"iting\", \n  948: \"chang\", \n  949: \"sc\", \n  950: \"boy\", \n  951: \"gy\", \n  952: \"since\", \n  953: \"ones\", \n  954: \"suc\", \n  955: \"cas\", \n  956: \"national\", \n  957: \"plac\", \n  958: \"teen\", \n  959: \"pose\", \n  960: \"started\", \n  961: \"mas\", \n  962: \"fi\", \n  963: \"fif\", \n  964: \"afr\", \n  965: \"fully\", \n  966: \"grou\", \n  967: \"wards\", \n  968: \"girl\", \n  969: \"e\", \n  970: \"t\", \n  971: \"a\", \n  972: \"o\", \n  973: \"i\", \n  974: \"n\", \n  975: \"s\", \n  976: \"h\", \n  977: \"r\", \n  978: \"l\", \n  979: \"d\", \n  980: \"u\", \n  981: \"c\", \n  982: \"m\", \n  983: \"w\", \n  984: \"f\", \n  985: \"g\", \n  986: \"y\", \n  987: \"p\", \n  988: \"b\", \n  989: \"v\", \n  990: \"k\", \n  991: \"'\", \n  992: \"x\", \n  993: \"j\", \n  994: \"q\", \n  995: \"z\", \n  996: \"-\", \n  997: \"2\", \n  998: \" \"\n};\n\nvar max_idx;\nvar string_element = \"\";\nvar string_idx = [];\nvar complete_sentence = \"\";\nvar for_string = [];\n\nfor(var i=0; i<frames; i++){\n    max_idx = indexOfMax(probabilities_matrix[i]);\n    string_element = dict[max_idx];\n    string_idx.push(string_element);\n    if (string_element == \"2\"){\n        try{\n            var prev = for_string[-1];\n            for_string[i] = '$';\n            for_string[i] = prev;\n            continue;\n        }\n        catch(err){\n            for_string[i] = ' ';\n            continue;\n        }\n        \n    }\n    if(string_element != \"_\"){\n        for_string[i] = string_element;\n    }\n}\nvar nonull_arr = [];\nvar count = 0;\nfor(i=0; i<for_string.length; i++){\n    if(for_string[i]!=null){\n        if(count == 0){\n            nonull_arr[count] = for_string[i];\n            count = count + 1;\n        }\n        nonull_arr[count] = for_string[i];\n        count = count + 1;\n    }\n}\n\nvar duplicate_arr = JSON.parse(JSON.stringify(nonull_arr));\nduplicate_arr.push(null);\nvar clean_arr = [];\ncount = 0;\n\nfor(i=0;i<duplicate_arr.length;i++){\n    if(duplicate_arr[i]!=null){\n        if(nonull_arr[i]!=duplicate_arr[i+1]){\n            //no duplicate\n            if(count == 0){\n                clean_arr[count] = nonull_arr[i];\n            }\n            clean_arr[count] = nonull_arr[i];\n            count = count + 1;\n        }\n    }\n}\ncomplete_sentence = clean_arr.join(\"\").toString();\nvar output_text = \"\";\n\nif(complete_sentence==\"\"){\n    output_text = \"Unable to perform speech recognition\";\n}\nelse if(complete_sentence==\" \"){\n    output_text = \"only space is detected\";\n}\nelse{\n    output_text = complete_sentence;\n}\n\nmsg.Text_speech = output_text;\nreturn {msg: msg, metadata: metadata, msgType: msgType};"
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 332,
+          "layoutY": 246
+        },
+        "type": "org.thingsboard.rule.engine.transform.TbModelNode",
+        "name": "Speech recognition model",
+        "debugMode": true,
+        "configuration": {
+          "resourceId": "77200fe0-03fa-11ec-9cf4-4f3f36427c83",
+          "inputNames": [
+            "input"
+          ],
+          "outputNames": [
+            "output"
+          ]
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 674,
+          "layoutY": 253
+        },
+        "type": "org.thingsboard.rule.engine.telemetry.TbMsgTimeseriesNode",
+        "name": "Save results",
+        "debugMode": false,
+        "configuration": {
+          "defaultTTL": 0
+        }
+      }
+    ],
+    "connections": [
+      {
+        "fromIndex": 0,
+        "toIndex": 1,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 1,
+        "toIndex": 2,
+        "type": "Post telemetry"
+      },
+      {
+        "fromIndex": 2,
+        "toIndex": 4,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 2,
+        "toIndex": 5,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 2,
+        "toIndex": 5,
+        "type": "Failure"
+      },
+      {
+        "fromIndex": 3,
+        "toIndex": 5,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 3,
+        "toIndex": 5,
+        "type": "Failure"
+      },
+      {
+        "fromIndex": 4,
+        "toIndex": 3,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 4,
+        "toIndex": 5,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 4,
+        "toIndex": 5,
+        "type": "Failure"
+      }
+    ],
+    "ruleChainConnections": null
+  }
+}
