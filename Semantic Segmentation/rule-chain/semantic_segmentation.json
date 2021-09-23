@@ -1,0 +1,220 @@
+{
+  "ruleChain": {
+    "additionalInfo": {
+      "description": ""
+    },
+    "name": "Semantic Segmentation",
+    "type": "CORE",
+    "firstRuleNodeId": null,
+    "root": false,
+    "debugMode": false,
+    "configuration": null
+  },
+  "metadata": {
+    "firstNodeIndex": 0,
+    "nodes": [
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 51,
+          "layoutY": 248
+        },
+        "type": "org.thingsboard.rule.engine.profile.TbDeviceProfileNode",
+        "name": "Input profile",
+        "debugMode": false,
+        "configuration": {
+          "persistAlarmRulesState": false,
+          "fetchAlarmRulesStateOnStart": false
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 49,
+          "layoutY": 356
+        },
+        "type": "org.thingsboard.rule.engine.filter.TbMsgTypeSwitchNode",
+        "name": "Message type switch",
+        "debugMode": false,
+        "configuration": {
+          "version": 0
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 387,
+          "layoutY": 151
+        },
+        "type": "org.thingsboard.rule.engine.transform.TbImageToArrayNode",
+        "name": "Image to array",
+        "debugMode": false,
+        "configuration": {
+          "inputNames": "image",
+          "outputNames": "input",
+          "ndArrayType": "FLOAT",
+          "width": 640,
+          "height": 480,
+          "includeMinibatchDim": true,
+          "aspectRatioHandling": "CENTER_CROP",
+          "ndFormat": "CHANNELS_FIRST",
+          "ndChannelLayout": "RGB",
+          "imageNormalizationType": "SCALE_01",
+          "listHandling": "NONE"
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 386,
+          "layoutY": 251
+        },
+        "type": "org.thingsboard.rule.engine.transform.TbTransformMsgNode",
+        "name": "Custom standardize",
+        "debugMode": false,
+        "configuration": {
+          "jsScript": "var inp = msg[\"input\"];\nvar in_arr = nj.array(inp);\n\nfor (k=0; k<in_arr.shape[1];k++){\n    for (i=0; i<in_arr.shape[2]; i++){\n        for (j=0; j<in_arr.shape[3]; j++){\n            \n            if (k==0) {\n                inp[0][k][i][j] = (inp[0][k][i][j]-0.485)/0.229;\n            }\n            if (k==1) {\n                inp[0][k][i][j] = (inp[0][k][i][j]-0.456)/0.224;\n            }\n            if (k==2) {\n                inp[0][k][i][j] = (inp[0][k][i][j]-0.406)/0.225;\n            }\n        }\n    }\n}\n\n\nreturn {msg: msg, metadata: metadata, msgType: msgType};"
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 386,
+          "layoutY": 352
+        },
+        "type": "org.thingsboard.rule.engine.transform.TbModelNode",
+        "name": "Model detection",
+        "debugMode": false,
+        "configuration": {
+          "resourceId": "6e5d16b0-1c18-11ec-a98a-0baf0184e1ec",
+          "inputNames": [
+            "input"
+          ],
+          "outputNames": [
+            "out",
+            "aux"
+          ]
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 388,
+          "layoutY": 464
+        },
+        "type": "org.thingsboard.rule.engine.transform.TbTransformMsgNode",
+        "name": "Post processing",
+        "debugMode": false,
+        "configuration": {
+          "jsScript": "var obj = {0: \"background\", 1:\"aeroplane\", 2:\"bicycle\", 3:\"bird\", 4:\"boat\", 5:\"bottle\", 6:\"bus\", 7:\"car\", 8:\"cat\", 9:\"chair\", 10:\"cow\", 11:\"diningtable\", 12:\"dog\", 13:\"horse\", 14:\"motorbike\", 15:\"person\", 16:\"pottedplant\", 17:\"sheep\", 18:\"sofa\", 19:\"train\", 20:\"tvmonitor\"};\n    \nvar output = msg[\"out\"];\nvar output_arr = nj.array(output);\nvar output_len = output_arr.shape[1];\n// num_classes_detected = output_len;\nvar out_output = output_arr.reshape(1,21,480,640);\n\nnum_class = out_output.shape[1];\nheight = out_output.shape[2];\nwidth = out_output.shape[3];\n\nfulldata = [];\nifulldata = 0;\n\nfor (i=0; i<height; i++){\n    data = [];\n    idata = 0;\n    for (j=0; j<width; j++){\n        max = out_output.get(0,0,i,j);\n        for (k=0; k<num_class; k++){\n            if (out_output.get(0,k,i,j)>=max){\n                max = out_output.get(0,k,i,j);\n                imax = k;\n            }\n\n        }\n        data[idata] = imax;\n        idata++;\n    }\n    fulldata[ifulldata] = data;\n    ifulldata++;\n}\n\nvar result = nj.array(fulldata);\nmaxclassprob = nj.max(out_output);\n\nindex = 0;\nfilter = [];\n//i for height(y)\n//j for width(x)\nfor (i=0;i<result.shape[0];i++){\n    for (j=0;j<result.shape[1];j++){\n        dict = {};\n        if (result.get(i,j)===0){\n            //pass\n        }\n        else {\n            x1 = j/(result.shape[1] - 1);\n            y1 = i/(result.shape[0] - 1);\n            x2 = (j+1)/(result.shape[1] - 1);\n            y2 = (i+1)/(result.shape[0] - 1);\n            dict['@x1'] = x1;\n            dict['@y1'] = y1;\n            dict['@x2'] = x2;\n            dict['@y2'] = y2;\n            dict.label = obj[result.get(i,j)];\n            dict.probability = maxclassprob;\n            filter[index] = dict;\n            index++;\n        }\n    }\n}\nmsg.bbox = filter;\nreturn {msg: msg, metadata: metadata, msgType: msgType};"
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 390,
+          "layoutY": 572
+        },
+        "type": "org.thingsboard.rule.engine.transform.TbDrawBoundingBoxesNode",
+        "name": "Draw on image",
+        "debugMode": false,
+        "configuration": {
+          "imageName": "image",
+          "bboxName": "bbox",
+          "drawLabel": false,
+          "drawProbability": false,
+          "classColors": {
+            "background": "black",
+            "aeroplane": "green",
+            "bicycle": "red",
+            "bird": "white",
+            "boat": "silver",
+            "bottle": "gray",
+            "bus": "blue",
+            "car": "maroon",
+            "cat": "yellow",
+            "chair": "olive",
+            "cow": "aqua",
+            "diningtable": "teal",
+            "dog": "navy",
+            "horse": "fuchsia",
+            "motorbike": "purple",
+            "person": "maroon",
+            "pottedplant": "silver",
+            "sheep": "gray",
+            "sofa": "aqua",
+            "train": "red",
+            "tvmonitor": "lime"
+          },
+          "color": "lime",
+          "lineThickness": 3,
+          "scale": "NONE",
+          "resizeH": 100,
+          "resizeW": 100,
+          "drawCropRegion": false,
+          "cropRegionColor": "purple",
+          "ndArrayType": "FLOAT",
+          "width": null,
+          "height": null,
+          "includeMinibatchDim": true,
+          "aspectRatioHandling": "CENTER_CROP",
+          "ndFormat": "CHANNELS_FIRST",
+          "ndChannelLayout": "RGB",
+          "imageNormalizationType": "SCALE",
+          "listHandling": "NONE"
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 706,
+          "layoutY": 574
+        },
+        "type": "org.thingsboard.rule.engine.telemetry.TbMsgTimeseriesNode",
+        "name": "Save to database",
+        "debugMode": false,
+        "configuration": {
+          "defaultTTL": 0
+        }
+      }
+    ],
+    "connections": [
+      {
+        "fromIndex": 0,
+        "toIndex": 1,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 1,
+        "toIndex": 2,
+        "type": "Post telemetry"
+      },
+      {
+        "fromIndex": 2,
+        "toIndex": 3,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 3,
+        "toIndex": 4,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 4,
+        "toIndex": 5,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 5,
+        "toIndex": 6,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 6,
+        "toIndex": 7,
+        "type": "Success"
+      }
+    ],
+    "ruleChainConnections": null
+  }
+}
