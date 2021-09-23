@@ -1,8 +1,8 @@
-# Model File - Example for Object Detection 
+# Model File - Example for Semantic Image Segmentation
 
 Click the link below to download the model for semantic image segmentation example:
 
-1. Fully COnvolution Network (FCN):
+1. Fully Convolution Network (FCN):
 
 https://drive.google.com/file/d/1hsC5psg6xjlOO4UmuS0iU1bDKDMTxjau/view?usp=sharing
 
