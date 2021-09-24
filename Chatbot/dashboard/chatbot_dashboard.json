@@ -1,0 +1,184 @@
+{
+  "title": "chatbot",
+  "image": null,
+  "configuration": {
+    "description": "",
+    "widgets": {
+      "6228adda-1d4c-bfa5-8c0a-2a542126d1e4": {
+        "isSystemType": false,
+        "bundleAlias": "chat",
+        "typeAlias": "chat_dialog",
+        "type": "timeseries",
+        "title": "New widget",
+        "image": null,
+        "description": null,
+        "sizeX": 8,
+        "sizeY": 5,
+        "config": {
+          "datasources": [
+            {
+              "type": "entity",
+              "name": null,
+              "entityAliasId": "3cafe8f7-1a43-070d-8db1-5f9245538f93",
+              "filterId": null,
+              "dataKeys": [
+                {
+                  "name": "chat",
+                  "type": "timeseries",
+                  "label": "chat",
+                  "color": "#2196f3",
+                  "settings": {},
+                  "_hash": 0.3907056347768971
+                },
+                {
+                  "name": "response",
+                  "type": "timeseries",
+                  "label": "response",
+                  "color": "#4caf50",
+                  "settings": {},
+                  "_hash": 0.6867211345413853
+                }
+              ]
+            }
+          ],
+          "timewindow": {
+            "hideInterval": false,
+            "hideAggregation": false,
+            "hideAggInterval": false,
+            "hideTimezone": false,
+            "selectedTab": 0,
+            "realtime": {
+              "realtimeType": 0,
+              "timewindowMs": 86400000,
+              "quickInterval": "CURRENT_DAY",
+              "interval": 300000
+            },
+            "aggregation": {
+              "type": "NONE",
+              "limit": 25000
+            }
+          },
+          "showTitle": true,
+          "backgroundColor": "#fff",
+          "color": "rgba(0, 0, 0, 0.87)",
+          "padding": "8px",
+          "settings": {
+            "shadowSize": 4,
+            "fontColor": "#545454",
+            "fontSize": 10,
+            "xaxis": {
+              "showLabels": true,
+              "color": "#545454"
+            },
+            "yaxis": {
+              "showLabels": true,
+              "color": "#545454"
+            },
+            "grid": {
+              "color": "#545454",
+              "tickColor": "#DDDDDD",
+              "verticalLines": true,
+              "horizontalLines": true,
+              "outlineWidth": 1
+            },
+            "legend": {
+              "show": true,
+              "position": "nw",
+              "backgroundColor": "#f0f0f0",
+              "backgroundOpacity": 0.85,
+              "labelBoxBorderColor": "rgba(1, 1, 1, 0.45)"
+            },
+            "decimals": 1,
+            "stack": false,
+            "tooltipIndividual": false
+          },
+          "title": "Chat Dialog",
+          "dropShadow": true,
+          "enableFullscreen": true,
+          "titleStyle": {
+            "fontSize": "16px",
+            "fontWeight": 400
+          },
+          "useDashboardTimewindow": false,
+          "showTitleIcon": false,
+          "iconColor": "rgba(0, 0, 0, 0.87)",
+          "iconSize": "24px",
+          "titleTooltip": "",
+          "widgetStyle": {},
+          "showLegend": false,
+          "displayTimewindow": true
+        },
+        "row": 0,
+        "col": 0,
+        "id": "6228adda-1d4c-bfa5-8c0a-2a542126d1e4"
+      }
+    },
+    "states": {
+      "default": {
+        "name": "chatbot",
+        "root": true,
+        "layouts": {
+          "main": {
+            "widgets": {
+              "6228adda-1d4c-bfa5-8c0a-2a542126d1e4": {
+                "sizeX": 8,
+                "sizeY": 10,
+                "row": 0,
+                "col": 0
+              }
+            },
+            "gridSettings": {
+              "backgroundColor": "#eeeeee",
+              "color": "rgba(0,0,0,0.870588)",
+              "columns": 24,
+              "margin": 10,
+              "backgroundSizeMode": "100%"
+            }
+          }
+        }
+      }
+    },
+    "entityAliases": {
+      "3cafe8f7-1a43-070d-8db1-5f9245538f93": {
+        "id": "3cafe8f7-1a43-070d-8db1-5f9245538f93",
+        "alias": "chat",
+        "filter": {
+          "type": "singleEntity",
+          "resolveMultiple": false,
+          "singleEntity": {
+            "entityType": "DEVICE",
+            "id": "9dbbdf10-1b58-11ec-a98a-0baf0184e1ec"
+          }
+        }
+      }
+    },
+    "filters": {},
+    "timewindow": {
+      "hideInterval": false,
+      "hideAggregation": false,
+      "hideAggInterval": false,
+      "hideTimezone": false,
+      "selectedTab": 0,
+      "realtime": {
+        "realtimeType": 0,
+        "timewindowMs": 600000,
+        "quickInterval": "CURRENT_DAY",
+        "interval": 60000
+      },
+      "aggregation": {
+        "type": "NONE",
+        "limit": 25000
+      }
+    },
+    "settings": {
+      "stateControllerId": "entity",
+      "showTitle": false,
+      "showDashboardsSelect": true,
+      "showEntitiesSelect": true,
+      "showDashboardTimewindow": true,
+      "showDashboardExport": true,
+      "toolbarAlwaysOpen": true
+    }
+  },
+  "name": "chatbot"
+}

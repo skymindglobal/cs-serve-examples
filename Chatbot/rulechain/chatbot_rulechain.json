@@ -1,0 +1,136 @@
+{
+  "ruleChain": {
+    "additionalInfo": {
+      "description": ""
+    },
+    "name": "chatbot",
+    "type": "CORE",
+    "firstRuleNodeId": null,
+    "root": false,
+    "debugMode": true,
+    "configuration": null
+  },
+  "metadata": {
+    "firstNodeIndex": 1,
+    "nodes": [
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 375,
+          "layoutY": 137
+        },
+        "type": "org.thingsboard.rule.engine.transform.TbTransformMsgNode",
+        "name": "input pre process",
+        "debugMode": true,
+        "configuration": {
+          "jsScript": "var sentence = msg.chat;\nvar arr = [];\nvar token_arr = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];\nvar diff;\nvar string_int;\nvar dict = {\n'OOV': 1, 'you': 2 , 'a': 3, 'i': 4, 'me': 5, 'to': 6,\n'account': 7, 'help': 8, 'what': 9, 'is': 10, 'for': 11, \n'are': 12, 'can': 13, 'need': 14, 'create': 15, 'new': 16, \n'complaint': 17, 'there': 18, 'thanks': 19, 'who': 20, 'your': 21,\n'name': 22, 'please': 23, 'support': 24, 'how': 25, 'open': 26, \n'want': 27, 'an': 28, 'hi': 29, 'hey': 30, 'anyone': 31, \n'hello': 32, 'hay': 33, 'bye': 34, 'see': 35, 'later': 36, \n'goodbye': 37, 'thank': 38, \"that's\": 39, 'helpful': 40, \n'the':41 , 'should': 42, 'call': 43, 'whats': 44, 'could': 45, \n'give': 46, 'hand': 47, 'do': 48, 'have': 49, 'raise': 50, \n'about': 51, 'service': 52\n};\n//remove special characters\nsentence = sentence.replace(/[^a-zA-Z0-9 ]/g, '');\n//split sentence to array\narr = sentence.split(\" \");\n//map the string with int in dictionary\nif(token_arr.length>arr.length){\n    diff = token_arr.length - arr.length;\n    for(var i=diff; i<token_arr.length; i++){\n        string_int = dict[arr[i-diff]];\n        if(string_int == null){\n            string_int = 1;\n        }\n        token_arr[i] = string_int;\n    }\n}else{\n    //only take the 1st 20 words\n    for(var i=0; i<token_arr.length; i++){\n        string_int = dict[arr[i]];\n        if(string_int == null){\n            string_int = 1;\n        }\n        token_arr[i] = string_int;\n    }\n}\nmsg.embedding_input = [token_arr];\nreturn {msg: msg, metadata: metadata, msgType: msgType};"
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 53,
+          "layoutY": 217
+        },
+        "type": "org.thingsboard.rule.engine.profile.TbDeviceProfileNode",
+        "name": "input profile",
+        "debugMode": true,
+        "configuration": {
+          "persistAlarmRulesState": false,
+          "fetchAlarmRulesStateOnStart": false
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 54,
+          "layoutY": 298
+        },
+        "type": "org.thingsboard.rule.engine.filter.TbMsgTypeSwitchNode",
+        "name": "message type switch",
+        "debugMode": true,
+        "configuration": {
+          "version": 0
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 379,
+          "layoutY": 217
+        },
+        "type": "org.thingsboard.rule.engine.transform.TbModelNode",
+        "name": "chatbot",
+        "debugMode": true,
+        "configuration": {
+          "resourceId": "ce2e0570-1b57-11ec-a98a-0baf0184e1ec",
+          "inputNames": [
+            "embedding_input"
+          ],
+          "outputNames": [
+            "dense_2"
+          ]
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 375,
+          "layoutY": 297
+        },
+        "type": "org.thingsboard.rule.engine.transform.TbTransformMsgNode",
+        "name": "output post process",
+        "debugMode": true,
+        "configuration": {
+          "jsScript": "var possible_tag = msg.dense_2[0];\nfunction indexOfMax(arr) {\n    if (arr.length === 0) {\n        return -1;\n    }\n    var max = arr[0];\n    var maxIndex = 0;\n    for (var i = 1; i < arr.length; i++) {\n        if (arr[i] > max) {\n            maxIndex = i;\n            max = arr[i];\n        }\n    }\n    return maxIndex;\n}\nvar max_idx = indexOfMax(possible_tag);\nvar dict = {\n  0: [\"I'm Joana, your bot assistant\", \"I'm Joana, an Artificial Intelligent bot\"],\n  1: [\"Please provide us your complaint in order to assist you\", \"Please mention your complaint, we will reach you and sorry for any inconvenience caused\"],\n  2: [\"You can just easily create a new account from our web site\", \"Just go to our web site and follow the guidelines to create a new account\"],\n  3: [\"See you later\", \"Have a nice day\", \"Bye! Come back again\"],\n  4: [\"Hello\", \"Hi\", \"Hi there\"],\n  5: [\"Tell me how can assist you\", \"Tell me your problem to assist you\", \"Yes Sure, How can I support you\"],\n  6: [\"You can call me Joana.\", \"I'm Joana!\", \"Just call me as Joana\"],\n  7: [\"Happy to help!\", \"Any time!\", \"My pleasure\", \"You're most welcome!\"]\n}\nvar responses = dict[max_idx];\n//choose random response\nvar random_response_id = Math.floor(Math.random() * responses.length)\nmsg.response = responses[random_response_id];\nreturn {msg: msg, metadata: metadata, msgType: msgType};"
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 658,
+          "layoutY": 218
+        },
+        "type": "org.thingsboard.rule.engine.telemetry.TbMsgTimeseriesNode",
+        "name": "save result",
+        "debugMode": true,
+        "configuration": {
+          "defaultTTL": 0
+        }
+      }
+    ],
+    "connections": [
+      {
+        "fromIndex": 0,
+        "toIndex": 3,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 1,
+        "toIndex": 2,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 2,
+        "toIndex": 0,
+        "type": "Post telemetry"
+      },
+      {
+        "fromIndex": 3,
+        "toIndex": 4,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 4,
+        "toIndex": 5,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 4,
+        "toIndex": 5,
+        "type": "Failure"
+      }
+    ],
+    "ruleChainConnections": null
+  }
+}
