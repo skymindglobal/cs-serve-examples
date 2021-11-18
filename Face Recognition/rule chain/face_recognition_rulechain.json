@@ -1,0 +1,440 @@
+{
+  "ruleChain": {
+    "additionalInfo": {
+      "description": ""
+    },
+    "name": "face recognition",
+    "type": "CORE",
+    "firstRuleNodeId": null,
+    "root": false,
+    "debugMode": false,
+    "configuration": null
+  },
+  "metadata": {
+    "firstNodeIndex": 12,
+    "nodes": [
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 618,
+          "layoutY": 257
+        },
+        "type": "org.thingsboard.rule.engine.action.TbReadFromCustomCassandraTableNode",
+        "name": "read_embeddings",
+        "debugMode": true,
+        "configuration": {
+          "tableName": "embeddings",
+          "columns": [
+            "embeddings",
+            "username"
+          ],
+          "columnFilters": {
+            "condition": [
+              {
+                "key": {
+                  "type": "ATTRIBUTE",
+                  "key": "username"
+                },
+                "valueType": "STRING",
+                "value": null,
+                "predicate": {
+                  "type": "COMPLEX",
+                  "operation": "AND",
+                  "predicates": [
+                    {
+                      "operation": "EQUAL",
+                      "value": {
+                        "defaultValue": "ignore_this",
+                        "dynamicValue": null
+                      },
+                      "ignoreCase": false,
+                      "type": "STRING"
+                    }
+                  ]
+                }
+              }
+            ],
+            "spec": {
+              "type": "SIMPLE"
+            }
+          },
+          "applyFilters": false
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 646,
+          "layoutY": 577
+        },
+        "type": "org.thingsboard.rule.engine.transform.TbTransformMsgNode",
+        "name": "array to string",
+        "debugMode": true,
+        "configuration": {
+          "jsScript": "msg.Identity = msg.Identity.toString();\n\nreturn {msg: {\"userId\": msg.userId, \"Identity\": msg.Identity}, metadata: metadata, msgType: msgType};"
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 367,
+          "layoutY": 503
+        },
+        "type": "org.thingsboard.rule.engine.transform.TbTransformMsgNode",
+        "name": "get params",
+        "debugMode": true,
+        "configuration": {
+          "jsScript": "return {msg: msg.params, metadata: metadata, msgType: msgType};"
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 922,
+          "layoutY": 570
+        },
+        "type": "org.thingsboard.rule.engine.rpc.TbSendRPCReplyNode",
+        "name": "reply",
+        "debugMode": false,
+        "configuration": {
+          "serviceIdMetaDataAttribute": "serviceId",
+          "sessionIdMetaDataAttribute": "sessionId",
+          "requestIdMetaDataAttribute": "requestId"
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 397,
+          "layoutY": 579
+        },
+        "type": "org.thingsboard.rule.engine.transform.TbImageToArrayNode",
+        "name": "input image (recognize)",
+        "debugMode": true,
+        "configuration": {
+          "inputNames": "image",
+          "outputNames": "input_1",
+          "ndArrayType": "FLOAT",
+          "width": 160,
+          "height": 160,
+          "includeMinibatchDim": true,
+          "aspectRatioHandling": "CENTER_CROP",
+          "ndFormat": "CHANNELS_LAST",
+          "ndChannelLayout": "RGB",
+          "imageNormalizationType": "NONE",
+          "listHandling": "NONE"
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 634,
+          "layoutY": 501
+        },
+        "type": "org.thingsboard.rule.engine.transform.TbModelNode",
+        "name": "face recognition",
+        "debugMode": true,
+        "configuration": {
+          "resourceId": "aa01fb70-252f-11ec-b64e-efab43e65f71",
+          "inputNames": [
+            "input_1"
+          ],
+          "outputNames": [
+            "Identity"
+          ]
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 891,
+          "layoutY": 491
+        },
+        "type": "org.thingsboard.rule.engine.action.TbSaveToCustomCassandraTableNode",
+        "name": "save_user",
+        "debugMode": true,
+        "configuration": {
+          "tableName": "embeddings",
+          "fieldsMapping": {
+            "Identity": "embeddings",
+            "userId": "username"
+          }
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 648,
+          "layoutY": 98
+        },
+        "type": "org.thingsboard.rule.engine.transform.TbDrawBoundingBoxesNode",
+        "name": "bounding box",
+        "debugMode": true,
+        "configuration": {
+          "imageName": "image",
+          "bboxName": "bbox",
+          "drawLabel": false,
+          "drawProbability": false,
+          "classColors": {
+            "face": "blue"
+          },
+          "color": "lime",
+          "lineThickness": 1,
+          "scale": "NONE",
+          "resizeH": 100,
+          "resizeW": 100,
+          "drawCropRegion": false,
+          "cropRegionColor": "purple",
+          "ndArrayType": "FLOAT",
+          "width": null,
+          "height": null,
+          "includeMinibatchDim": true,
+          "aspectRatioHandling": "CENTER_CROP",
+          "ndFormat": "CHANNELS_FIRST",
+          "ndChannelLayout": "RGB",
+          "imageNormalizationType": "SCALE",
+          "listHandling": "NONE"
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 376,
+          "layoutY": 19
+        },
+        "type": "org.thingsboard.rule.engine.transform.TbImageToArrayNode",
+        "name": "input image (detector)",
+        "debugMode": true,
+        "configuration": {
+          "inputNames": "image",
+          "outputNames": "input",
+          "ndArrayType": "FLOAT",
+          "width": 320,
+          "height": 240,
+          "includeMinibatchDim": true,
+          "aspectRatioHandling": "CENTER_CROP",
+          "ndFormat": "CHANNELS_FIRST",
+          "ndChannelLayout": "RGB",
+          "imageNormalizationType": "SCALE",
+          "listHandling": "NONE"
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 617,
+          "layoutY": 19
+        },
+        "type": "org.thingsboard.rule.engine.transform.TbTransformMsgNode",
+        "name": "select bounding box",
+        "debugMode": true,
+        "configuration": {
+          "jsScript": "box = [0,0,0,0]\nscore = 0;\n\nthreshold = 0.99;\nboxes = msg.boxes[0];\nconfidences = msg.scores[0];\n\nfor (var i = 0; (i * 2) < confidences.length; i++) {\n    score_index = i * 2;\n    box_index = i * 4;\n    current_score = confidences[score_index + 1];\n    if (current_score > threshold && current_score > score) {\n        score = current_score;\n        box = [boxes[box_index], boxes[box_index + 1], boxes[box_index + 2], boxes[box_index + 3]]\n    }\n} \n\nmsg.bbox = {\n    \"@x1\": box[0],\n    \"@y1\": box[1],\n    \"@x2\": box[2],\n    \"@y2\": box[3],\n    \"label\" : \"face\",\n    \"probability\" : score\n};\nreturn {msg: msg, metadata: metadata, msgType: msgType};"
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 377,
+          "layoutY": 98
+        },
+        "type": "org.thingsboard.rule.engine.transform.TbModelNode",
+        "name": "face detector",
+        "debugMode": true,
+        "configuration": {
+          "resourceId": "fc6b3100-dd69-11eb-b7ae-0d7d633dee56",
+          "inputNames": [
+            "input"
+          ],
+          "outputNames": [
+            "scores",
+            "boxes"
+          ]
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 935,
+          "layoutY": 183
+        },
+        "type": "org.thingsboard.rule.engine.telemetry.TbMsgTimeseriesNode",
+        "name": "results",
+        "debugMode": true,
+        "configuration": {
+          "defaultTTL": 0
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 51,
+          "layoutY": 218
+        },
+        "type": "org.thingsboard.rule.engine.profile.TbDeviceProfileNode",
+        "name": "input profile",
+        "debugMode": true,
+        "configuration": {
+          "persistAlarmRulesState": false,
+          "fetchAlarmRulesStateOnStart": false
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 44,
+          "layoutY": 294
+        },
+        "type": "org.thingsboard.rule.engine.filter.TbMsgTypeSwitchNode",
+        "name": "type switch",
+        "debugMode": true,
+        "configuration": {
+          "version": 0
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 374,
+          "layoutY": 257
+        },
+        "type": "org.thingsboard.rule.engine.transform.TbImageToArrayNode",
+        "name": "input image (recognize)",
+        "debugMode": true,
+        "configuration": {
+          "inputNames": "image",
+          "outputNames": "input_1",
+          "ndArrayType": "FLOAT",
+          "width": 160,
+          "height": 160,
+          "includeMinibatchDim": true,
+          "aspectRatioHandling": "CENTER_CROP",
+          "ndFormat": "CHANNELS_LAST",
+          "ndChannelLayout": "RGB",
+          "imageNormalizationType": "NONE",
+          "listHandling": "NONE"
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 378,
+          "layoutY": 339
+        },
+        "type": "org.thingsboard.rule.engine.transform.TbModelNode",
+        "name": "face recognition",
+        "debugMode": true,
+        "configuration": {
+          "resourceId": "aa01fb70-252f-11ec-b64e-efab43e65f71",
+          "inputNames": [
+            "input_1"
+          ],
+          "outputNames": [
+            "Identity"
+          ]
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 633,
+          "layoutY": 338
+        },
+        "type": "org.thingsboard.rule.engine.transform.TbTransformMsgNode",
+        "name": "post process",
+        "debugMode": true,
+        "configuration": {
+          "jsScript": "function indexOfMax(arr) {\n    if (arr.length === 0) {\n        return -1;\n    }\n\n    var max = arr[0];\n    var maxIndex = 0;\n\n    for (var i = 1; i < arr.length; i++) {\n        if (arr[i] > max) {\n            maxIndex = i;\n            max = arr[i];\n        }\n    }\n\n    return maxIndex;\n}\n\nthreshold = 0.93;\nto_compare = msg.Identity[0];\n\nabsToCompare = nj.sqrt(nj.dot(to_compare, to_compare)).get(0);\n\nsimilarities = msg.databaseReadOutput.map(function(item) {\n    return {\n        \"name\": item.username,\n        \"embedding\": item.embeddings.split(',').map(function(item) {\n            return Number(item);\n        })\n    };\n}).map(function(item) {\n    absEmbedding = nj.sqrt(nj.dot(item.embedding, item.embedding)).get(0);\n    return nj.dot(item.embedding, to_compare).get(0) / (absEmbedding * absToCompare);\n});\n\nscore = nj.max(similarities);\n\nif(score < threshold) {\n    result = \"The user found is 'unknown'\";\n} else {\n    result = \"The user found is '\" + msg.databaseReadOutput[indexOfMax(similarities)].username + \"'\";    \n}\n\nreturn {\n    msg: {\n        \"score\": score,\n        \"result\": result\n    },\n    metadata: metadata,\n    msgType: msgType\n};"
+        }
+      }
+    ],
+    "connections": [
+      {
+        "fromIndex": 0,
+        "toIndex": 16,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 1,
+        "toIndex": 6,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 2,
+        "toIndex": 4,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 4,
+        "toIndex": 5,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 5,
+        "toIndex": 1,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 6,
+        "toIndex": 3,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 7,
+        "toIndex": 11,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 8,
+        "toIndex": 10,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 9,
+        "toIndex": 7,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 10,
+        "toIndex": 9,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 12,
+        "toIndex": 13,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 13,
+        "toIndex": 8,
+        "type": "Post telemetry"
+      },
+      {
+        "fromIndex": 13,
+        "toIndex": 14,
+        "type": "Post telemetry"
+      },
+      {
+        "fromIndex": 13,
+        "toIndex": 2,
+        "type": "RPC Request from Device"
+      },
+      {
+        "fromIndex": 14,
+        "toIndex": 15,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 15,
+        "toIndex": 0,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 16,
+        "toIndex": 11,
+        "type": "Success"
+      }
+    ],
+    "ruleChainConnections": null
+  }
+}
