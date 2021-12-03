@@ -1,2 +1,0 @@
-curl -X POST http://$URL_DOMAIN/api/v1/$ACCESS_TOKEN/telemetry -F "image=@$IMAGE_DIRECTORY\download3.png"
-
