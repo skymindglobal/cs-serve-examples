@@ -10,7 +10,7 @@ path = $IMAGE_FOLDER #replace $IMAGE_FOLDER with the directory of the image fold
 # Change the directory
 os.chdir(path)
 
-url = 'http://$URL_DOMAIN/api/v1/$ACCESS_TOKEN/telemetry' #replace $ACCESS_TOKEN with input access token && $URL_DOMAIN with url domain
+url = 'https://$URL_DOMAIN/api/v1/$ACCESS_TOKEN/telemetry' #replace $ACCESS_TOKEN with input access token && $URL_DOMAIN with url domain
 
 # iterate through all image files
 for imagefile in os.listdir():
