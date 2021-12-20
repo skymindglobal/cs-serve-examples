@@ -13,7 +13,7 @@ new_height = 416                         # resize width value
 
 
 def main():
-    url = f'https://cs.hyperlinx.ai/api/v1/{sys.argv[1]}/telemetry'
+    url = f'https://app.creatorsuite.ai/api/v1/{sys.argv[1]}/telemetry'
     cap = cv2.VideoCapture(sys.argv[2])  # use cv2.VideoCapture(0) for webcam footage
     count = 0                            # count for every frame
     count_sent = 0                       # count for every frame sent to the server
