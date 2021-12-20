@@ -1,2 +1,2 @@
-curl -X POST http://$URL_DOMAIN/api/v1/$ACCESS_TOKEN/telemetry -F "image=@$IMAGE_DIRECTORY\example3.jpg"
+curl -X POST https://$URL_DOMAIN/api/v1/$ACCESS_TOKEN/telemetry -F "image=@$IMAGE_DIRECTORY\example3.jpg"
 
