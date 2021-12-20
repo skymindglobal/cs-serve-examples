@@ -37,7 +37,7 @@ while cap.isOpened():
         cv2.imwrite("image.png", frame)
         t2 = time.time()
         print(f"Time: {t2 - t1}s")
-        url = f'http://cs.hyperlinx.ai/api/v1/{sys.argv[1]}/telemetry'
+        url = f'https://app.creatorsuite.ai/api/v1/{sys.argv[1]}/telemetry'
         files = {'image': ('image.png', open('image.png', 'rb'), 'image/png')}
         requests.post(url, files=files)
         print(f"Time: {time.time() - t2}s")
