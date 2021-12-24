@@ -1,0 +1,921 @@
+{
+  "title": "Pedestrian Walkway Surveillance",
+  "image": null,
+  "configuration": {
+    "description": "",
+    "widgets": {
+      "350aed5b-5b8d-5b3d-04ed-d20253c4f543": {
+        "isSystemType": true,
+        "bundleAlias": "cards",
+        "typeAlias": "html_card",
+        "type": "static",
+        "title": "New widget",
+        "image": null,
+        "description": null,
+        "sizeX": 7.5,
+        "sizeY": 3,
+        "config": {
+          "datasources": [],
+          "timewindow": {
+            "realtime": {
+              "timewindowMs": 60000
+            }
+          },
+          "showTitle": false,
+          "backgroundColor": "#87ceeb",
+          "color": "#edeef0",
+          "padding": "2px",
+          "settings": {
+            "cardHtml": "<div class='card'>Pedestrian Walkway Surveillance</div>",
+            "cardCss": ".card {\n    font-weight: bold;\n    font-size: 16px;\n    color: #101828;\n    width: 100%;\n    height: 100%;\n    display: flex;\n    align-items: flex-start;\n    justify-content: flex-start;\n    padding-left: 10px;\n}"
+          },
+          "title": "New HTML Card",
+          "dropShadow": true,
+          "showTitleIcon": false,
+          "iconColor": "rgba(0, 0, 0, 0.87)",
+          "iconSize": "24px",
+          "titleTooltip": "",
+          "enableFullscreen": false,
+          "widgetStyle": {},
+          "titleStyle": {
+            "fontSize": "16px",
+            "fontWeight": 400
+          },
+          "showLegend": false
+        },
+        "row": 0,
+        "col": 0,
+        "id": "350aed5b-5b8d-5b3d-04ed-d20253c4f543"
+      },
+      "545e42b6-47c9-f9fe-0d8e-dc8cdc7a3719": {
+        "isSystemType": true,
+        "bundleAlias": "kraftboard",
+        "typeAlias": "show_image",
+        "type": "latest",
+        "title": "New widget",
+        "image": null,
+        "description": null,
+        "sizeX": 4.5,
+        "sizeY": 5,
+        "config": {
+          "datasources": [
+            {
+              "type": "entity",
+              "name": null,
+              "entityAliasId": "a89d489b-7087-8d27-1bc8-9e6b9a363052",
+              "filterId": null,
+              "dataKeys": [
+                {
+                  "name": "image",
+                  "type": "timeseries",
+                  "label": "image",
+                  "color": "#2196f3",
+                  "settings": {},
+                  "_hash": 0.5374422681106605
+                }
+              ]
+            }
+          ],
+          "timewindow": {
+            "realtime": {
+              "timewindowMs": 60000
+            }
+          },
+          "showTitle": false,
+          "backgroundColor": "#87ceeb",
+          "color": "rgba(0, 0, 0, 0.87)",
+          "padding": "8px",
+          "settings": {
+            "backgroundImageUrl": "data:image/svg+xml;base64,PHN2ZyBpZD0ic3ZnMiIgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iMTAwIiB3aWR0aD0iMTAwIiB2ZXJzaW9uPSIxLjEiIHhtbG5zOmNjPSJodHRwOi8vY3JlYXRpdmVjb21tb25zLm9yZy9ucyMiIHhtbG5zOmRjPSJodHRwOi8vcHVybC5vcmcvZGMvZWxlbWVudHMvMS4xLyIgdmlld0JveD0iMCAwIDEwMCAxMDAiPgogPGcgaWQ9ImxheWVyMSIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCAtOTUyLjM2KSI+CiAgPHJlY3QgaWQ9InJlY3Q0Njg0IiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBoZWlnaHQ9Ijk5LjAxIiB3aWR0aD0iOTkuMDEiIHN0cm9rZT0iIzAwMCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiB5PSI5NTIuODYiIHg9Ii40OTUwNSIgc3Ryb2tlLXdpZHRoPSIuOTkwMTAiIGZpbGw9IiNlZWUiLz4KICA8dGV4dCBpZD0idGV4dDQ2ODYiIHN0eWxlPSJ3b3JkLXNwYWNpbmc6MHB4O2xldHRlci1zcGFjaW5nOjBweDt0ZXh0LWFuY2hvcjptaWRkbGU7dGV4dC1hbGlnbjpjZW50ZXIiIGZvbnQtd2VpZ2h0PSJib2xkIiB4bWw6c3BhY2U9InByZXNlcnZlIiBmb250LXNpemU9IjEwcHgiIGxpbmUtaGVpZ2h0PSIxMjUlIiB5PSI5NzAuNzI4MDkiIHg9IjQ5LjM5NjQ3NyIgZm9udC1mYW1pbHk9IlJvYm90byIgZmlsbD0iIzY2NjY2NiI+PHRzcGFuIGlkPSJ0c3BhbjQ2OTAiIHg9IjUwLjY0NjQ3NyIgeT0iOTcwLjcyODA5Ij5JbWFnZSBiYWNrZ3JvdW5kIDwvdHNwYW4+PHRzcGFuIGlkPSJ0c3BhbjQ2OTIiIHg9IjQ5LjM5NjQ3NyIgeT0iOTgzLjIyODA5Ij5pcyBub3QgY29uZmlndXJlZDwvdHNwYW4+PC90ZXh0PgogIDxyZWN0IGlkPSJyZWN0NDY5NCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgaGVpZ2h0PSIxOS4zNiIgd2lkdGg9IjY5LjM2IiBzdHJva2U9IiMwMDAiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgeT0iOTkyLjY4IiB4PSIxNS4zMiIgc3Ryb2tlLXdpZHRoPSIuNjM5ODYiIGZpbGw9Im5vbmUiLz4KIDwvZz4KPC9zdmc+Cg==",
+            "labels": [
+              {
+                "pattern": "Value: ${#0:2} units.",
+                "x": 20,
+                "y": 47,
+                "font": {
+                  "color": "#515151",
+                  "family": "Roboto",
+                  "size": 6,
+                  "style": "normal",
+                  "weight": "500"
+                }
+              }
+            ]
+          },
+          "title": "New Show Image",
+          "dropShadow": true,
+          "enableFullscreen": true,
+          "titleStyle": {
+            "fontSize": "16px",
+            "fontWeight": 400
+          },
+          "showTitleIcon": false,
+          "iconColor": "rgba(0, 0, 0, 0.87)",
+          "iconSize": "24px",
+          "titleTooltip": "",
+          "widgetStyle": {},
+          "showLegend": false
+        },
+        "row": 0,
+        "col": 0,
+        "id": "545e42b6-47c9-f9fe-0d8e-dc8cdc7a3719"
+      },
+      "e9cf0cbe-7077-06c9-f515-e0b819beb501": {
+        "isSystemType": false,
+        "bundleAlias": "rtsp_widgets",
+        "typeAlias": "image_info",
+        "type": "latest",
+        "title": "New widget",
+        "image": null,
+        "description": null,
+        "sizeX": 7.5,
+        "sizeY": 5,
+        "config": {
+          "datasources": [
+            {
+              "type": "entity",
+              "name": null,
+              "entityAliasId": "a89d489b-7087-8d27-1bc8-9e6b9a363052",
+              "filterId": null,
+              "dataKeys": [
+                {
+                  "name": "info",
+                  "type": "timeseries",
+                  "label": "info",
+                  "color": "#2196f3",
+                  "settings": {},
+                  "_hash": 0.8941406348365883
+                }
+              ]
+            }
+          ],
+          "timewindow": {
+            "realtime": {
+              "timewindowMs": 60000
+            }
+          },
+          "showTitle": false,
+          "backgroundColor": "rgba(29,34,53,0)",
+          "color": "rgba(0, 0, 0, 0.87)",
+          "padding": "8px",
+          "settings": {},
+          "title": "New Image Info",
+          "showTitleIcon": false,
+          "iconColor": "rgba(0, 0, 0, 0.87)",
+          "iconSize": "24px",
+          "titleTooltip": "",
+          "dropShadow": true,
+          "enableFullscreen": true,
+          "widgetStyle": {},
+          "titleStyle": {
+            "fontSize": "16px",
+            "fontWeight": 400
+          },
+          "showLegend": false
+        },
+        "row": 0,
+        "col": 0,
+        "id": "e9cf0cbe-7077-06c9-f515-e0b819beb501"
+      },
+      "8c4cb9b4-5c3c-b354-e531-1cbddda6a675": {
+        "isSystemType": false,
+        "bundleAlias": "rtsp_widgets",
+        "typeAlias": "location_globe",
+        "type": "static",
+        "title": "New widget",
+        "image": null,
+        "description": null,
+        "sizeX": 6.5,
+        "sizeY": 3,
+        "config": {
+          "datasources": [],
+          "timewindow": {
+            "realtime": {
+              "timewindowMs": 60000
+            }
+          },
+          "showTitle": false,
+          "backgroundColor": "#000000",
+          "color": "rgba(104,150,118,0.87)",
+          "padding": "1px",
+          "settings": {
+            "labelPosition": "top"
+          },
+          "title": "New Location & Globe",
+          "dropShadow": true,
+          "enableFullscreen": false,
+          "titleStyle": {
+            "fontSize": "16px",
+            "fontWeight": 400
+          },
+          "units": "",
+          "decimals": 0,
+          "useDashboardTimewindow": true,
+          "showLegend": false,
+          "widgetStyle": {
+            "clip-path": "polygon(0 5%, 33% 5%, 37% 0, 100% 0, 100% 100%, 0 100%)",
+            "background": "linear-gradient(#568fb3, #568fb3) 0 0 / 70% 5px,linear-gradient(#568fb3, #568fb3) left/ 5px 100%,#0b0d16",
+            "background-repeat": "no-repeat"
+          },
+          "actions": {},
+          "showTitleIcon": false,
+          "iconColor": "rgba(0, 0, 0, 0.87)",
+          "iconSize": "24px",
+          "titleTooltip": ""
+        },
+        "row": 0,
+        "col": 0,
+        "id": "8c4cb9b4-5c3c-b354-e531-1cbddda6a675"
+      },
+      "9601cb07-9503-1c00-a329-00e72be7892f": {
+        "isSystemType": false,
+        "bundleAlias": "rtsp_widgets",
+        "typeAlias": "running_code",
+        "type": "static",
+        "title": "New widget",
+        "image": null,
+        "description": null,
+        "sizeX": 5,
+        "sizeY": 3.5,
+        "config": {
+          "datasources": [],
+          "timewindow": {
+            "realtime": {
+              "timewindowMs": 60000
+            }
+          },
+          "showTitle": false,
+          "backgroundColor": "#0a0d17",
+          "color": "rgba(104,150,118,0.87)",
+          "padding": "4px",
+          "settings": {
+            "labelPosition": "top"
+          },
+          "title": "New Running code",
+          "dropShadow": true,
+          "enableFullscreen": false,
+          "titleStyle": {
+            "fontSize": "16px",
+            "fontWeight": 400
+          },
+          "units": "",
+          "decimals": 0,
+          "useDashboardTimewindow": true,
+          "showLegend": false,
+          "widgetStyle": {
+            "clip-path": "polygon(0 5%, 33% 5%, 37% 0, 100% 0, 100% 100%, 0 100%)",
+            "background": "linear-gradient(#568fb3, #568fb3) 0 0 / 70% 5px,linear-gradient(#568fb3, #568fb3) left/ 5px 100%,#0a0d17",
+            "background-repeat": "no-repeat"
+          },
+          "actions": {},
+          "showTitleIcon": false,
+          "iconColor": "rgba(0, 0, 0, 0.87)",
+          "iconSize": "24px",
+          "titleTooltip": ""
+        },
+        "row": 0,
+        "col": 0,
+        "id": "9601cb07-9503-1c00-a329-00e72be7892f"
+      },
+      "6c385e02-9e06-041b-7ff6-3d9b7b699201": {
+        "isSystemType": false,
+        "bundleAlias": "rtsp_widgets",
+        "typeAlias": "people_count_widget",
+        "type": "latest",
+        "title": "New widget",
+        "image": null,
+        "description": null,
+        "sizeX": 8,
+        "sizeY": 3,
+        "config": {
+          "datasources": [
+            {
+              "type": "entity",
+              "name": null,
+              "entityAliasId": "a89d489b-7087-8d27-1bc8-9e6b9a363052",
+              "filterId": null,
+              "dataKeys": [
+                {
+                  "name": "numperson",
+                  "type": "timeseries",
+                  "label": "numperson",
+                  "color": "#2196f3",
+                  "settings": {},
+                  "_hash": 0.8221076369823839
+                }
+              ]
+            }
+          ],
+          "timewindow": {
+            "realtime": {
+              "timewindowMs": 60000
+            }
+          },
+          "showTitle": false,
+          "backgroundColor": "#0a0d17",
+          "color": "rgba(0, 0, 0, 0.87)",
+          "padding": "4px",
+          "settings": {},
+          "title": "New People count widget",
+          "showTitleIcon": false,
+          "iconColor": "rgba(0, 0, 0, 0.87)",
+          "iconSize": "24px",
+          "titleTooltip": "",
+          "dropShadow": true,
+          "enableFullscreen": false,
+          "widgetStyle": {
+            "clip-path": "polygon(0 5%, 33% 5%, 37% 0, 100% 0, 100% 100%, 0 100%)",
+            "background": "linear-gradient(#568fb3, #568fb3) 0 0 / 70% 5px,linear-gradient(#568fb3, #568fb3) left/ 5px 100%,#0a0d17",
+            "background-repeat": "no-repeat"
+          },
+          "titleStyle": {
+            "fontSize": "16px",
+            "fontWeight": 400
+          },
+          "showLegend": false
+        },
+        "row": 0,
+        "col": 0,
+        "id": "6c385e02-9e06-041b-7ff6-3d9b7b699201"
+      },
+      "5059501b-31ec-45be-f056-a1637fd22ce8": {
+        "isSystemType": false,
+        "bundleAlias": "rtsp_widgets",
+        "typeAlias": "gender_widget",
+        "type": "latest",
+        "title": "New widget",
+        "image": null,
+        "description": null,
+        "sizeX": 7.5,
+        "sizeY": 3,
+        "config": {
+          "datasources": [
+            {
+              "type": "entity",
+              "name": null,
+              "entityAliasId": "a89d489b-7087-8d27-1bc8-9e6b9a363052",
+              "filterId": null,
+              "dataKeys": [
+                {
+                  "name": "nummale",
+                  "type": "timeseries",
+                  "label": "nummale",
+                  "color": "#2196f3",
+                  "settings": {},
+                  "_hash": 0.7439778011694218
+                },
+                {
+                  "name": "numfemale",
+                  "type": "timeseries",
+                  "label": "numfemale",
+                  "color": "#4caf50",
+                  "settings": {},
+                  "_hash": 0.2225546458322858
+                }
+              ]
+            }
+          ],
+          "timewindow": {
+            "realtime": {
+              "timewindowMs": 60000
+            }
+          },
+          "showTitle": false,
+          "backgroundColor": "#0a0d17",
+          "color": "rgba(224,222,222,0.87)",
+          "padding": "8px",
+          "settings": {},
+          "title": "New Gender widget",
+          "showTitleIcon": false,
+          "iconColor": "rgba(0, 0, 0, 0.87)",
+          "iconSize": "24px",
+          "titleTooltip": "",
+          "dropShadow": true,
+          "enableFullscreen": false,
+          "widgetStyle": {
+            "clip-path": "polygon(0 5%, 33% 5%, 37% 0, 100% 0, 100% 100%, 0 100%)",
+            "background": "linear-gradient(#568fb3, #568fb3) 0 0 / 70% 5px,linear-gradient(#568fb3, #568fb3) left/ 5px 100%,#0a0d17",
+            "background-repeat": "no-repeat"
+          },
+          "titleStyle": {
+            "fontSize": "16px",
+            "fontWeight": 400
+          },
+          "showLegend": false
+        },
+        "row": 0,
+        "col": 0,
+        "id": "5059501b-31ec-45be-f056-a1637fd22ce8"
+      },
+      "3cf735ad-c30c-1faa-889e-30986e63b374": {
+        "isSystemType": false,
+        "bundleAlias": "rtsp_widgets",
+        "typeAlias": "chart_2_0",
+        "type": "timeseries",
+        "title": "New widget",
+        "image": null,
+        "description": null,
+        "sizeX": 7.5,
+        "sizeY": 2.5,
+        "config": {
+          "datasources": [
+            {
+              "type": "entity",
+              "name": null,
+              "entityAliasId": "a89d489b-7087-8d27-1bc8-9e6b9a363052",
+              "filterId": null,
+              "dataKeys": [
+                {
+                  "name": "person",
+                  "type": "timeseries",
+                  "label": "person",
+                  "color": "#2196f3",
+                  "settings": {},
+                  "_hash": 0.8889943682836778
+                }
+              ]
+            }
+          ],
+          "timewindow": {
+            "hideInterval": false,
+            "hideAggregation": false,
+            "hideAggInterval": false,
+            "hideTimezone": false,
+            "selectedTab": 0,
+            "realtime": {
+              "realtimeType": 0,
+              "timewindowMs": 10000,
+              "quickInterval": "CURRENT_DAY",
+              "interval": 1000
+            },
+            "aggregation": {
+              "type": "NONE",
+              "limit": 25000
+            }
+          },
+          "showTitle": false,
+          "backgroundColor": "#0a0d17",
+          "color": "rgba(218,212,212,0.87)",
+          "padding": "8px",
+          "settings": {
+            "shadowSize": 4,
+            "fontColor": "#545454",
+            "fontSize": 10,
+            "xaxis": {
+              "showLabels": true,
+              "color": "#545454"
+            },
+            "yaxis": {
+              "showLabels": true,
+              "color": "#545454"
+            },
+            "grid": {
+              "color": "#545454",
+              "tickColor": "#DDDDDD",
+              "verticalLines": true,
+              "horizontalLines": true,
+              "outlineWidth": 1
+            },
+            "legend": {
+              "show": true,
+              "position": "nw",
+              "backgroundColor": "#f0f0f0",
+              "backgroundOpacity": 0.85,
+              "labelBoxBorderColor": "rgba(1, 1, 1, 0.45)"
+            },
+            "decimals": 1,
+            "stack": false,
+            "tooltipIndividual": false
+          },
+          "title": "New Chart 2.0",
+          "dropShadow": true,
+          "enableFullscreen": false,
+          "titleStyle": {
+            "fontSize": "16px",
+            "fontWeight": 400
+          },
+          "useDashboardTimewindow": false,
+          "displayTimewindow": false,
+          "showTitleIcon": false,
+          "iconColor": "rgba(0, 0, 0, 0.87)",
+          "iconSize": "24px",
+          "titleTooltip": "",
+          "widgetStyle": {
+            "clip-path": "polygon(0 5%, 33% 5%, 37% 0, 100% 0, 100% 100%, 0 100%)",
+            "background": "linear-gradient(#568fb3, #568fb3) 0 0 / 70% 5px,linear-gradient(#568fb3, #568fb3) left/ 5px 100%,#0a0d17",
+            "background-repeat": "no-repeat"
+          },
+          "showLegend": false,
+          "legendConfig": {
+            "direction": "column",
+            "position": "bottom",
+            "sortDataKeys": false,
+            "showMin": false,
+            "showMax": false,
+            "showAvg": true,
+            "showTotal": false
+          }
+        },
+        "row": 0,
+        "col": 0,
+        "id": "3cf735ad-c30c-1faa-889e-30986e63b374"
+      },
+      "7ab8e83f-77ba-13e5-7089-10da020d653c": {
+        "isSystemType": false,
+        "bundleAlias": "rtsp_widgets",
+        "typeAlias": "people_count_widget2",
+        "type": "latest",
+        "title": "New widget",
+        "image": null,
+        "description": null,
+        "sizeX": 7.5,
+        "sizeY": 3,
+        "config": {
+          "datasources": [
+            {
+              "type": "entity",
+              "name": null,
+              "entityAliasId": "a89d489b-7087-8d27-1bc8-9e6b9a363052",
+              "filterId": null,
+              "dataKeys": [
+                {
+                  "name": "numalert",
+                  "type": "timeseries",
+                  "label": "numalert",
+                  "color": "#2196f3",
+                  "settings": {
+                    "useCellStyleFunction": false,
+                    "cellStyleFunction": "",
+                    "useCellContentFunction": false,
+                    "cellContentFunction": ""
+                  },
+                  "_hash": 0.43299644895021494
+                }
+              ]
+            }
+          ],
+          "timewindow": {
+            "realtime": {
+              "timewindowMs": 60000
+            }
+          },
+          "showTitle": false,
+          "backgroundColor": "#0a0d17",
+          "color": "rgba(0, 0, 0, 0.87)",
+          "padding": "4px",
+          "settings": {
+            "labelPosition": "center"
+          },
+          "title": "New Social distancing widget",
+          "showTitleIcon": false,
+          "iconColor": "rgba(255,255,255,0.87)",
+          "iconSize": "24px",
+          "titleTooltip": "",
+          "dropShadow": true,
+          "enableFullscreen": false,
+          "widgetStyle": {
+            "clip-path": "polygon(0 5%, 33% 5%, 37% 0, 100% 0, 100% 100%, 0 100%)",
+            "background": "linear-gradient(#568fb3, #568fb3) 0 0 / 70% 5px,linear-gradient(#568fb3, #568fb3) left/ 5px 100%,#0a0d17",
+            "background-repeat": "no-repeat"
+          },
+          "titleStyle": {
+            "fontSize": "16px",
+            "fontWeight": 400
+          },
+          "showLegend": false
+        },
+        "row": 0,
+        "col": 0,
+        "id": "7ab8e83f-77ba-13e5-7089-10da020d653c"
+      },
+      "397b00d8-2b56-d587-adc2-5621b7638b8c": {
+        "isSystemType": false,
+        "bundleAlias": "rtsp_widgets",
+        "typeAlias": "mask_wearing_violation_counter",
+        "type": "latest",
+        "title": "New widget",
+        "image": null,
+        "description": null,
+        "sizeX": 7.5,
+        "sizeY": 3,
+        "config": {
+          "datasources": [
+            {
+              "type": "entity",
+              "name": null,
+              "entityAliasId": "a89d489b-7087-8d27-1bc8-9e6b9a363052",
+              "filterId": null,
+              "dataKeys": [
+                {
+                  "name": "numnomask",
+                  "type": "timeseries",
+                  "label": "numnomask",
+                  "color": "#2196f3",
+                  "settings": {
+                    "useCellStyleFunction": false,
+                    "cellStyleFunction": "",
+                    "useCellContentFunction": false,
+                    "cellContentFunction": ""
+                  },
+                  "_hash": 0.9858658491769265
+                }
+              ]
+            }
+          ],
+          "timewindow": {
+            "realtime": {
+              "timewindowMs": 60000
+            }
+          },
+          "showTitle": false,
+          "backgroundColor": "#0a0d17",
+          "color": "rgba(251,249,249,0.87)",
+          "padding": "8px",
+          "settings": {
+            "labelPosition": "center"
+          },
+          "title": "New Mask wearing violation counter",
+          "showTitleIcon": false,
+          "iconColor": "rgba(0, 0, 0, 0.87)",
+          "iconSize": "24px",
+          "titleTooltip": "",
+          "dropShadow": true,
+          "enableFullscreen": false,
+          "widgetStyle": {
+            "clip-path": "polygon(0 5%, 33% 5%, 37% 0, 100% 0, 100% 100%, 0 100%)",
+            "background": "linear-gradient(#568fb3, #568fb3) 0 0 / 70% 5px,linear-gradient(#568fb3, #568fb3) left/ 5px 100%,#0a0d17",
+            "background-repeat": "no-repeat"
+          },
+          "titleStyle": {
+            "fontSize": "16px",
+            "fontWeight": 400
+          },
+          "showLegend": false
+        },
+        "row": 0,
+        "col": 0,
+        "id": "397b00d8-2b56-d587-adc2-5621b7638b8c"
+      },
+      "41e7934a-2db9-7632-2932-d22178496fe1": {
+        "isSystemType": false,
+        "bundleAlias": "rtsp_widgets",
+        "typeAlias": "database_table",
+        "type": "timeseries",
+        "title": "New widget",
+        "image": null,
+        "description": null,
+        "sizeX": 8,
+        "sizeY": 2.5,
+        "config": {
+          "datasources": [
+            {
+              "type": "entity",
+              "name": null,
+              "entityAliasId": "a89d489b-7087-8d27-1bc8-9e6b9a363052",
+              "filterId": null,
+              "dataKeys": [
+                {
+                  "name": "nomaskdata",
+                  "type": "timeseries",
+                  "label": "nomaskdata",
+                  "color": "#2196f3",
+                  "settings": {},
+                  "_hash": 0.3739220606307554
+                }
+              ]
+            }
+          ],
+          "timewindow": {
+            "hideInterval": false,
+            "hideAggregation": false,
+            "hideAggInterval": false,
+            "hideTimezone": false,
+            "selectedTab": 0,
+            "realtime": {
+              "realtimeType": 0,
+              "timewindowMs": 86400000,
+              "quickInterval": "CURRENT_DAY",
+              "interval": 5000
+            },
+            "aggregation": {
+              "type": "NONE",
+              "limit": 25000
+            }
+          },
+          "showTitle": false,
+          "backgroundColor": "#0a0d17",
+          "color": "rgba(235,226,226,0.87)",
+          "padding": "8px",
+          "settings": {
+            "shadowSize": 4,
+            "fontColor": "#545454",
+            "fontSize": 10,
+            "xaxis": {
+              "showLabels": true,
+              "color": "#545454"
+            },
+            "yaxis": {
+              "showLabels": true,
+              "color": "#545454"
+            },
+            "grid": {
+              "color": "#545454",
+              "tickColor": "#DDDDDD",
+              "verticalLines": true,
+              "horizontalLines": true,
+              "outlineWidth": 1
+            },
+            "legend": {
+              "show": true,
+              "position": "nw",
+              "backgroundColor": "#f0f0f0",
+              "backgroundOpacity": 0.85,
+              "labelBoxBorderColor": "rgba(1, 1, 1, 0.45)"
+            },
+            "decimals": 1,
+            "stack": false,
+            "tooltipIndividual": false
+          },
+          "title": "New Database Table",
+          "dropShadow": true,
+          "enableFullscreen": false,
+          "titleStyle": {
+            "fontSize": "16px",
+            "fontWeight": 400
+          },
+          "useDashboardTimewindow": false,
+          "displayTimewindow": false,
+          "showTitleIcon": false,
+          "iconColor": "rgba(0, 0, 0, 0.87)",
+          "iconSize": "24px",
+          "titleTooltip": "",
+          "widgetStyle": {
+            "clip-path": "polygon(0 5%, 33% 5%, 37% 0, 100% 0, 100% 100%, 0 100%)",
+            "background": "linear-gradient(#568fb3, #568fb3) 0 0 / 70% 5px,linear-gradient(#568fb3, #568fb3) left/ 5px 100%,#0a0d17",
+            "background-repeat": "no-repeat"
+          },
+          "showLegend": false,
+          "legendConfig": {
+            "direction": "column",
+            "position": "bottom",
+            "sortDataKeys": false,
+            "showMin": false,
+            "showMax": false,
+            "showAvg": true,
+            "showTotal": false
+          }
+        },
+        "row": 0,
+        "col": 0,
+        "id": "41e7934a-2db9-7632-2932-d22178496fe1"
+      }
+    },
+    "states": {
+      "default": {
+        "name": "Pedestrian Walkway Surveillance - sync",
+        "root": true,
+        "layouts": {
+          "main": {
+            "widgets": {
+              "350aed5b-5b8d-5b3d-04ed-d20253c4f543": {
+                "sizeX": 30,
+                "sizeY": 1,
+                "row": 0,
+                "col": 0
+              },
+              "545e42b6-47c9-f9fe-0d8e-dc8cdc7a3719": {
+                "sizeX": 16,
+                "sizeY": 9,
+                "row": 1,
+                "col": 0
+              },
+              "e9cf0cbe-7077-06c9-f515-e0b819beb501": {
+                "sizeX": 10,
+                "sizeY": 5,
+                "row": 10,
+                "col": 6
+              },
+              "8c4cb9b4-5c3c-b354-e531-1cbddda6a675": {
+                "sizeX": 14,
+                "sizeY": 5,
+                "row": 10,
+                "col": 16
+              },
+              "9601cb07-9503-1c00-a329-00e72be7892f": {
+                "sizeX": 6,
+                "sizeY": 5,
+                "row": 10,
+                "col": 0
+              },
+              "6c385e02-9e06-041b-7ff6-3d9b7b699201": {
+                "sizeX": 7,
+                "sizeY": 3,
+                "row": 1,
+                "col": 16
+              },
+              "5059501b-31ec-45be-f056-a1637fd22ce8": {
+                "sizeX": 7,
+                "sizeY": 3,
+                "row": 4,
+                "col": 16
+              },
+              "3cf735ad-c30c-1faa-889e-30986e63b374": {
+                "sizeX": 7,
+                "sizeY": 3,
+                "row": 7,
+                "col": 16
+              },
+              "7ab8e83f-77ba-13e5-7089-10da020d653c": {
+                "sizeX": 7,
+                "sizeY": 3,
+                "row": 4,
+                "col": 23
+              },
+              "397b00d8-2b56-d587-adc2-5621b7638b8c": {
+                "sizeX": 7,
+                "sizeY": 3,
+                "row": 7,
+                "col": 23
+              },
+              "41e7934a-2db9-7632-2932-d22178496fe1": {
+                "sizeX": 7,
+                "sizeY": 3,
+                "row": 1,
+                "col": 23
+              }
+            },
+            "gridSettings": {
+              "backgroundColor": "#101828",
+              "color": "rgba(0,0,0,0.59)",
+              "columns": 30,
+              "margin": 10,
+              "backgroundSizeMode": "100%",
+              "autoFillHeight": true,
+              "backgroundImageUrl": null,
+              "mobileAutoFillHeight": false,
+              "mobileRowHeight": 70
+            }
+          }
+        }
+      }
+    },
+    "entityAliases": {
+      "a89d489b-7087-8d27-1bc8-9e6b9a363052": {
+        "id": "a89d489b-7087-8d27-1bc8-9e6b9a363052",
+        "alias": "pws",
+        "filter": {
+          "type": "singleEntity",
+          "resolveMultiple": false,
+          "singleEntity": {
+            "entityType": "DEVICE",
+            "id": "5df21260-648b-11ec-b0a8-753eb00f392e"
+          }
+        }
+      }
+    },
+    "filters": {},
+    "timewindow": {
+      "displayValue": "",
+      "hideInterval": false,
+      "hideAggregation": false,
+      "hideAggInterval": false,
+      "hideTimezone": false,
+      "selectedTab": 0,
+      "realtime": {
+        "realtimeType": 0,
+        "interval": 1000,
+        "timewindowMs": 60000,
+        "quickInterval": "CURRENT_DAY"
+      },
+      "history": {
+        "historyType": 0,
+        "interval": 1000,
+        "timewindowMs": 60000,
+        "fixedTimewindow": {
+          "startTimeMs": 1638334890995,
+          "endTimeMs": 1638421290995
+        },
+        "quickInterval": "CURRENT_DAY"
+      },
+      "aggregation": {
+        "type": "AVG",
+        "limit": 25000
+      }
+    },
+    "settings": {
+      "stateControllerId": "entity",
+      "showTitle": false,
+      "showDashboardsSelect": false,
+      "showEntitiesSelect": true,
+      "showDashboardTimewindow": true,
+      "showDashboardExport": true,
+      "toolbarAlwaysOpen": false,
+      "titleColor": "rgba(0,0,0,0.870588)",
+      "showFilters": false,
+      "showDashboardLogo": false,
+      "dashboardLogoUrl": null,
+      "showUpdateDashboardImage": false
+    }
+  },
+  "name": "Pedestrian Walkway Surveillance"
+}

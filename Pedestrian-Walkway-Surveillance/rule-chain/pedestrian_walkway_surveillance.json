@@ -1,0 +1,385 @@
+{
+  "ruleChain": {
+    "additionalInfo": {
+      "description": ""
+    },
+    "name": "Pedestrian Walkway Surveillance",
+    "type": "CORE",
+    "firstRuleNodeId": null,
+    "root": false,
+    "debugMode": false,
+    "configuration": null
+  },
+  "metadata": {
+    "firstNodeIndex": 1,
+    "nodes": [
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 370,
+          "layoutY": 230
+        },
+        "type": "org.thingsboard.rule.engine.transform.TbModelNode",
+        "name": "Face and Mask detector",
+        "debugMode": true,
+        "configuration": {
+          "resourceId": "4f279ff0-5bc3-11ec-b0a8-753eb00f392e",
+          "inputNames": [
+            "images"
+          ],
+          "outputNames": [
+            "classes",
+            "yolo1",
+            "yolo2"
+          ]
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 48,
+          "layoutY": 252
+        },
+        "type": "org.thingsboard.rule.engine.profile.TbDeviceProfileNode",
+        "name": "Input profile",
+        "debugMode": true,
+        "configuration": {
+          "persistAlarmRulesState": false,
+          "fetchAlarmRulesStateOnStart": false
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 50,
+          "layoutY": 346
+        },
+        "type": "org.thingsboard.rule.engine.filter.TbMsgTypeSwitchNode",
+        "name": "Message type switch",
+        "debugMode": true,
+        "configuration": {
+          "version": 0
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 369,
+          "layoutY": 151
+        },
+        "type": "org.thingsboard.rule.engine.transform.TbImageToArrayNode",
+        "name": "Image to array",
+        "debugMode": true,
+        "configuration": {
+          "inputNames": "image",
+          "outputNames": "images",
+          "ndArrayType": "FLOAT",
+          "width": null,
+          "height": null,
+          "includeMinibatchDim": true,
+          "aspectRatioHandling": "CENTER_CROP",
+          "ndFormat": "CHANNELS_FIRST",
+          "ndChannelLayout": "RGB",
+          "imageNormalizationType": "SCALE_01",
+          "listHandling": "NONE"
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 1013,
+          "layoutY": 147
+        },
+        "type": "org.thingsboard.rule.engine.transform.TbTransformMsgNode",
+        "name": "Send to database",
+        "debugMode": true,
+        "configuration": {
+          "jsScript": "var persondata = [msg.person];\nvar alertdata = [msg.alert];\nvar mdata = msg.moutarr;\nvar gdata = msg.goutarr;\ntime = Math.floor(metadata.ts/1000) * 1000;\n\nmsg.personData01 = persondata.concat(time).toString();\nmsg.alertData01 = alertdata.concat(time).toString();\nmsg.maskData01 = mdata.concat(time).toString();\nmsg.genderData01 = gdata.concat(time).toString();\nreturn {msg: msg, metadata: metadata, msgType: msgType};"
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 1013,
+          "layoutY": 225
+        },
+        "type": "org.thingsboard.rule.engine.action.TbSaveToCustomCassandraTableNode",
+        "name": "Save to database",
+        "debugMode": true,
+        "configuration": {
+          "tableName": "pwsdb4",
+          "fieldsMapping": {
+            "maskData01": "mask_data",
+            "genderData01": "gender_data",
+            "personData01": "person_data",
+            "alertData01": "alert_data"
+          }
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 1014,
+          "layoutY": 300
+        },
+        "type": "org.thingsboard.rule.engine.action.TbReadFromCustomCassandraTableNode",
+        "name": "Read from database",
+        "debugMode": true,
+        "configuration": {
+          "tableName": "pwsdb4",
+          "columns": [
+            "mask_data",
+            "gender_data",
+            "person_data",
+            "alert_data"
+          ],
+          "columnFilters": {
+            "condition": [
+              {
+                "key": {
+                  "type": "ATTRIBUTE",
+                  "key": "cropImage01"
+                },
+                "valueType": "STRING",
+                "value": null,
+                "predicate": {
+                  "operation": "EQUAL",
+                  "value": {
+                    "defaultValue": "ignore_this",
+                    "dynamicValue": null
+                  },
+                  "ignoreCase": false,
+                  "type": "STRING"
+                }
+              }
+            ],
+            "spec": {
+              "type": "SIMPLE"
+            }
+          }
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 1011,
+          "layoutY": 378
+        },
+        "type": "org.thingsboard.rule.engine.transform.TbTransformMsgNode",
+        "name": "Parsing data",
+        "debugMode": true,
+        "configuration": {
+          "jsScript": "var database = msg.databaseReadOutput;\r\n\r\ndateacs = arrangeTime(database);\r\nvar no_mask_process = dataToTimeseries(database, dateacs);\r\nmsg.nomaskdata = no_mask_process[0];\r\nmsg.numnomask = no_mask_process[1];\r\nvar info = dataToInfo(database, dateacs);\r\nif (msg.numnomaskref > 0) {\r\n    msg.info = info[0].concat(nj.array(msg.croppedImg[info[1]]).reshape(1,3,224,224));\r\n}\r\nelse {\r\n    msg.info = [\"NO MASK OFF DETECTED\", \"-\", \"-\", \"-\", \"-\", \"Kuala Lumpur\", nj.zeros([1,3,224,224])];\r\n}\r\nmsg.refershape = nj.array(msg.croppedImg[info[1]]).shape;\r\nmsg.refer = info[1];\r\nmsg.croppedImg = msg.croppedImg[info[1]];\r\nvar counting_process = dataToCount(database, dateacs);\r\nmsg.numperson = counting_process[0];\r\nmsg.numalert = counting_process[1];\r\nmsg.nummale = counting_process[2];\r\nmsg.numfemale = counting_process[3];\r\n\r\nfunction arrangeTime(database) {\r\n    dateacs = [];\r\n    maskdatalength = database.length;\r\n    for(ij=0; ij<maskdatalength; ij++) {\r\n        textlength = database[ij].mask_data.length;\r\n        dateacs[ij] = parseInt(database[ij].mask_data.substring(textlength - 13));\r\n    }\r\n    return dateacs.sort(function(a, b){return b-a});\r\n}\r\n\r\nfunction dataToTimeseries(database, dateacs) {\r\n    dataindex = 0;\r\n    datats = [];\r\n    for (idataacs=0; idataacs<dateacs.length; idataacs++) {\r\n        for (idatabase=0; idatabase<database.length; idatabase++) {\r\n            textlength = database[idatabase].mask_data.length;\r\n            if (parseInt(database[idatabase].mask_data.substring(textlength - 13))==dateacs[idataacs]) {\r\n                datatext = database[idatabase].mask_data.substring(0, textlength - 13);\r\n                var dts = new Date(dateacs[idataacs]);\r\n                yy = dts.getFullYear().toString().substr(-2);\r\n                mm = (dts.getMonth() + 1).toString();\r\n                dd = dts.getDate().toString();\r\n                time = dts.toLocaleTimeString([], { hour: \"2-digit\", minute: \"2-digit\" }).substr(0,5).replace(\":\",\"\");\r\n                date = dd+\"/\"+mm+\"/\"+yy;\r\n                for (i=0; i<datatext.length; i++) {\r\n                    if (parseInt(datatext[i])==1) {\r\n                        //pass;\r\n                    }\r\n                    else if (parseInt(datatext[i])==0) {\r\n                        datats[dataindex] = [date, time, \"IMG1\", \"MASK OFF\"];\r\n                        dataindex++;\r\n                    }\r\n                }\r\n            }\r\n        }\r\n    }\r\n    return [datats, dataindex++];\r\n}\r\n\r\nfunction dataToInfo(database, dateacs) {\r\n\r\n    datats1 = [];\r\n    ref = 0;\r\n    var months_name = [\"Jan\",\"Feb\",\"Mar\",\"Apr\",\"May\",\"Jun\",\"Jul\",\"Aug\",\"Sep\",\"Oct\",\"Nov\",\"Dec\"];\r\n    genderoption = [\"MALE\",\"FEMALE\"];\r\n    for (idatabase1=0; idatabase1<database.length; idatabase1++) {\r\n        textlength = database[idatabase1].mask_data.length;\r\n        if (parseInt(database[idatabase1].mask_data.substring(textlength - 13))==dateacs[0]) {\r\n            datatext0 = database[idatabase1].mask_data.substring(0, textlength - 13);\r\n            var dts1 = new Date(dateacs[0]);\r\n            yy1 = dts1.getFullYear().toString().substr(-2);\r\n            mm1 = dts1.getMonth();\r\n            dd1 = dts1.getDate().toString();\r\n            time1 = dts1.toLocaleTimeString([], { hour: \"2-digit\", minute: \"2-digit\" }).substr(0,5);\r\n            date1 = dd1+\" \"+months_name[mm1]+\" \"+yy1;\r\n            for (i1=0; i1<datatext.length; i1++) {\r\n                if (parseInt(datatext0[i1])==1) {\r\n                    ref++;\r\n                    //pass;\r\n                }\r\n                else if (parseInt(datatext0[i1])==0) {\r\n                    datatext1 = database[idatabase1].gender_data.substring(0, textlength - 13);\r\n                    genderrclass = parseInt(datatext1[i1]);\r\n                    datats1 = [genderoption[genderrclass], \"Adult\", \"MASK OFF\", date1, time1, \"Kuala Lumpur\"];\r\n                    ref++;\r\n                    referenceImg = ref - 1;\r\n                }\r\n            }\r\n        }\r\n    }\r\n    return [datats1, referenceImg];\r\n}\r\n\r\nfunction dataToCount(database, dateacs) {\r\n\r\n    male = 0;\r\n    female = 0;\r\n    numperson = 0;\r\n    numalert = 0;\r\n\r\n    for (idatabase2=0; idatabase2<database.length; idatabase2++) {\r\n\r\n        ptextlength = msg.databaseReadOutput[idatabase2].person_data.length;\r\n        numperson += parseInt(msg.databaseReadOutput[idatabase2].person_data.substring(0, ptextlength - 14));\r\n\r\n        atextlength = msg.databaseReadOutput[idatabase2].alert_data.length;\r\n        numalert += parseInt(msg.databaseReadOutput[idatabase2].alert_data.substring(0, atextlength - 14));\r\n\r\n        gtextlength = database[idatabase2].gender_data.length;\r\n        datatext2 = database[idatabase2].gender_data.substring(0, gtextlength - 14);\r\n        for (ig=0; ig<datatext2.length; ig++) {\r\n            if (parseInt(datatext2[ig])==0) {\r\n                male++;\r\n            }\r\n            else if (parseInt(datatext2[ig])==1) {\r\n                female++;\r\n            }\r\n        }\r\n    }\r\n    return [numperson, numalert, male, female];\r\n}\r\n\r\nreturn {msg: msg, metadata: metadata, msgType: msgType};"
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 689,
+          "layoutY": 148
+        },
+        "type": "org.thingsboard.rule.engine.transform.TbImageToArrayNode",
+        "name": "Image to array (for crop)",
+        "debugMode": true,
+        "configuration": {
+          "inputNames": "image",
+          "outputNames": "data",
+          "ndArrayType": "FLOAT",
+          "width": null,
+          "height": null,
+          "includeMinibatchDim": true,
+          "aspectRatioHandling": "CENTER_CROP",
+          "ndFormat": "CHANNELS_FIRST",
+          "ndChannelLayout": "RGB",
+          "imageNormalizationType": "NONE",
+          "listHandling": "NONE"
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 693,
+          "layoutY": 228
+        },
+        "type": "org.thingsboard.rule.engine.transform.TbTransformMsgNode",
+        "name": "Pre processing (cropped image)",
+        "debugMode": true,
+        "configuration": {
+          "jsScript": "var ccoors = msg.cropcoors;\nvar data = msg.data;\nvar img1 = nj.array(data);\nfunction cropImg(data, ccoors) {\n    var img = nj.array(data);\n    var coorsarr = nj.array(ccoors);\n    var pad = nj.zeros([ccoors.length,3,224,224]);\n    var pad1 = nj.zeros([ccoors.length,3,224,224]);\n\n    \n    for (indexc = 0; indexc<ccoors.length; indexc++) {\n\n        distX = ccoors[indexc][1] - ccoors[indexc][0];\n        distY = ccoors[indexc][3] - ccoors[indexc][2];\n        locX = Math.round((224-distX)/2);\n        locY = Math.round((224-distY)/2);\n        maxDist = Math.max(distX, distY);\n        ratio = Math.round(224/maxDist);\n        if (maxDist * ratio > 224) {\n            ratio--;\n        }\n        if (ratio==0) {\n            ratio = 1;\n        }\n\n        rlocX = Math.round((224-(distX*ratio))/2);\n        rlocY = Math.round((224-(distY*ratio))/2);\n        Y = ccoors[indexc][2];\n        X = ccoors[indexc][0];\n        \n        for (i=0; i<3; i++) {\n            for (j=0; j<distY; j++) {\n                for (k=0; k<distX; k++) {\n                    if (i==0) {\n                        pad.set(indexc, 0, j+locY, k+locX, img.get(0,0,j+Y,k+X) - 104);\n                        if (ratio == 1) {\n                            pad1.set(indexc, 0, j+locY, k+locX, img.get(0,0,j+Y,k+X));\n                        }\n                        else {\n                            for (iresizey=0; iresizey<ratio; iresizey++) {\n                                for (iresizex=0; iresizex<ratio; iresizex++) {\n                                    pad1.set(indexc, 0, (j*ratio)+rlocY+iresizey, (k*ratio)+rlocX+iresizex, img.get(0,0,j+Y,k+X));\n                                    \n                                }\n                            }\n                        }\n                        \n                    }\n                    if (i==1) {\n                        pad.set(indexc, 1, j+locY, k+locX, img.get(0,1,j+Y,k+X) - 117);\n                        if (ratio == 1) {\n                            pad1.set(indexc, 1, j+locY, k+locX, img.get(0,1,j+Y,k+X));\n                        }\n                        else {\n                            for (iresizey=0; iresizey<ratio; iresizey++) {\n                                for (iresizex=0; iresizex<ratio; iresizex++) {\n                                    pad1.set(indexc, 1, (j*ratio)+rlocY+iresizey, (k*ratio)+rlocX+iresizex, img.get(0,1,j+Y,k+X));\n                                    \n                                }\n                            }\n                        }\n                    }\n                    if (i==2) {\n                        pad.set(indexc, 2, j+locY, k+locX, img.get(0,2,j+Y,k+X) - 123);\n                        if (ratio == 1) {\n                            pad1.set(indexc, 2, j+locY, k+locX, img.get(0,2,j+Y,k+X));\n                        }\n                        else {\n                            for (iresizey=0; iresizey<ratio; iresizey++) {\n                                for (iresizex=0; iresizex<ratio; iresizex++) {\n                                    pad1.set(indexc, 2, (j*ratio)+rlocY+iresizey, (k*ratio)+rlocX+iresizex, img.get(0,2,j+Y,k+X));\n                                    \n                                }\n                            }\n                        }\n                    }\n                }\n            }\n        }\n        \n    }\n    return [pad, pad1];\n}\n\nfunction checkZero(ip) {\n    l = ip.shape[0] * ip.shape[1] * ip.shape[2] * ip.shape[3];\n    statuszero = [];\n    for (b = 0; b<ip.shape[0]; b++) {\n        \n        for (rgb = 0; rgb<ip.shape[1]; rgb++) {\n            for (h = 0; h<ip.shape[2]; h++) {\n                for (w = 0; w<ip.shape[3]; w++) {\n                    if (ip.get(b, rgb, h, w) == 0) {\n                        xx = \"zero\";//pass\n                    }\n                    else {\n                        xx = \"not zero\";\n                        break;\n                    }\n                }\n                if (xx !== \"zero\") {\n                    break;//pass\n                }\n            }\n            if (xx !== \"zero\") {\n                break;//pass\n            }\n        }\n        statuszero[b] = xx;\n        \n    }\n    return statuszero;\n}\nvar croppedImage = cropImg(data, ccoors);\n// msg.zero = checkZero(testing[0]);\nmsg[\"input\"] = croppedImage[0];\nmsg.croppedImg = croppedImage[1];\n\nreturn {msg: msg, metadata: metadata, msgType: msgType};"
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 686,
+          "layoutY": 305
+        },
+        "type": "org.thingsboard.rule.engine.transform.TbModelNode",
+        "name": "Gender classify",
+        "debugMode": true,
+        "configuration": {
+          "resourceId": "d9123600-57b1-11ec-bcc8-4dccd0e6dcbc",
+          "inputNames": [
+            "input"
+          ],
+          "outputNames": [
+            "loss3/loss3_Y"
+          ]
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 685,
+          "layoutY": 384
+        },
+        "type": "org.thingsboard.rule.engine.transform.TbTransformMsgNode",
+        "name": "Post processing 2",
+        "debugMode": true,
+        "configuration": {
+          "jsScript": "var newMsg = {};\nvar output = msg[\"loss3/loss3_Y\"];\ntoreshape = output[0].length / 2;\nvar data = nj.array(output).reshape(toreshape, 2);\nvar result = countGender(data);\nnewMsg.person = msg.person;\nnewMsg.alert = msg.alert;\nnewMsg.numnomaskref = msg.numnomask;\n// newMsg.numnomask = msg.numnomask;\n// newMsg.nummask = msg.nummask;\n// newMsg.nummale = result[0];\n// newMsg.numfemale = result[1];\nnewMsg.bbox = msg.bbox;\nnewMsg.croppedImg = msg.croppedImg;\nnewMsg.image = msg.image;\nnewMsg.cropcoors = msg.cropcoors;\nnewMsg.moutarr = msg.moutarr;\nnewMsg.goutarr = result[2];\n\nfunction countGender(data) {\n    male = 0;\n    female = 0;\n    gtempout = [];\n    for (iGender=0; iGender<data.shape[0]; iGender++) {\n        index=0;\n        maxi=data.get(iGender,0);\n        for (var i=0;i<2;i++) {\n            check = data.get(iGender,i);\n            if (maxi>=check) {\n                maxi = maxi;\n            }else {\n                maxi = check;\n                index = i;\n            }\n        }\n        gtempout[iGender] = index;\n        if (index===0) {male++}\n        else {female++}\n    }\n    return [male, female, gtempout];\n}\n\nreturn {msg: newMsg, metadata: metadata, msgType: msgType};"
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 1011,
+          "layoutY": 462
+        },
+        "type": "org.thingsboard.rule.engine.transform.TbDrawBoundingBoxesNode",
+        "name": "Draw face mask result bbox",
+        "debugMode": true,
+        "configuration": {
+          "imageName": "image",
+          "bboxName": "bbox",
+          "drawLabel": false,
+          "drawProbability": false,
+          "classColors": {
+            "nomask": "red",
+            "mask": "lime"
+          },
+          "color": "lime",
+          "lineThickness": 1,
+          "scale": "NONE",
+          "resizeH": 100,
+          "resizeW": 100,
+          "drawCropRegion": false,
+          "cropRegionColor": "purple",
+          "ndArrayType": "FLOAT",
+          "width": null,
+          "height": null,
+          "includeMinibatchDim": true,
+          "aspectRatioHandling": "CENTER_CROP",
+          "ndFormat": "CHANNELS_FIRST",
+          "ndChannelLayout": "RGB",
+          "imageNormalizationType": "SCALE",
+          "listHandling": "NONE"
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 372,
+          "layoutY": 306
+        },
+        "type": "org.thingsboard.rule.engine.transform.TbTransformMsgNode",
+        "name": "Post processing 1",
+        "debugMode": true,
+        "configuration": {
+          "jsScript": "var output = msg[\"classes\"];\nout_arr = nj.array(output).reshape(2400,7);\nvar obj = {0: \"nomask\", 1:\"mask\"};\nindex = 0;\nmin_wh = 0.3;\nmax_wh = 4096;\nfiltered_output = [];\nfiltered_nomask = [];\ninomask = 0;\nfiltered_mask = [];\nimask = 0;\nfor (i=0; i<2400; i++) {\n    conf = out_arr.get(i,4);\n    if (conf > 0.3 && out_arr.get(i,2) > min_wh && out_arr.get(i,3) > min_wh && out_arr.get(i,2) < max_wh && out_arr.get(i,3) < max_wh) {\n        coors = [];\n        prob = sigmoid(conf/10);\n        coors = xywh2xyxy(out_arr.get(i,0), out_arr.get(i,1), out_arr.get(i,2), out_arr.get(i,3));\n        if (out_arr.get(i,5) * conf > out_arr.get(i,6) * conf) {\n            c = 0;\n            filtered_nomask[inomask] = coors.concat(prob, c);\n            inomask++;\n        }\n        else {\n            c = 1;\n            filtered_mask[imask] = coors.concat(prob, c);\n            imask++;\n        }\n        index++;\n    }\n}\n\nlastmaxdetection = [];\nprocess_detected_nomask = NMS(listInOrder(filtered_nomask));\nlastmaxdetection = lastmaxdetection.concat(process_detected_nomask);\nprocess_detected_mask = NMS(listInOrder(filtered_mask));\nlastmaxdetection = lastmaxdetection.concat(process_detected_mask);\n\n\nfunction xywh2xyxy(x, y, w, h) {\n    x1 = x - w/2;\n    y1 = y - h/2;\n    x2 = x + w/2;\n    y2 = y + h/2;\n    \n    return [x1,y1,x2,y2];\n}\n\nfunction sigmoid(x) {\n    return 1 / (1 + Math.exp(-x));\n}\n\nfunction listInOrder(databyclass) {\n    \n    databyclassacs = [];\n    masklength = databyclass.length;\n    k = 0;\n    for (q = 0; q < masklength; q++) {\n        maxconf = databyclass[0][4];\n        for (p = 0; p < databyclass.length; p++) {\n            if (databyclass[p][4] >= maxconf) {\n                maxconf = databyclass[p][4];\n                imaxconf = p;\n            }\n        }\n        databyclassacs[k] = databyclass[imaxconf];\n        databyclass.splice(imaxconf,1);\n        k++;\n    }\n    return databyclassacs;\n}\n\nfunction NMS(databyclassacs) {\n    \n    maxdetection = [];\n    imaxdetection = 0;\n\n    while (databyclassacs.length > 0) {\n        basebox = databyclassacs[0];\n        maxdetection[imaxdetection] = databyclassacs[0];\n        if (databyclassacs.length===1) {\n            break;\n        }\n        to_check = databyclassacs;\n        to_check.splice(0,1);\n        databyclassacs = Bboxious(basebox,to_check);\n        imaxdetection++;\n    }\n    return maxdetection;\n}\n\nfunction Bboxious(box1, box2) {\n    b1_x1 = box1[0];\n    b1_y1 = box1[1];\n    b1_x2 = box1[2];\n    b1_y2 = box1[3];\n    index_iou = [];\n    iindex_iou = 0;\n\n    for (ibox=0; ibox<box2.length; ibox++) {\n        b2_x1 = box2[ibox][0];\n        b2_y1 = box2[ibox][1];\n        b2_x2 = box2[ibox][2];\n        b2_y2 = box2[ibox][3];\n\n        inter_rect_x1 = Math.max(b1_x1,b2_x1);\n        inter_rect_y1 = Math.max(b1_y1,b2_y1);\n        inter_rect_x2 = Math.min(b1_x2,b2_x2);\n        inter_rect_y2 = Math.min(b1_y2,b2_y2);\n\n        inter_area1 = inter_rect_x2 - inter_rect_x1 + 1;\n        if (inter_area1<0) {\n            inter_area1=0;\n        }\n        inter_area2 = inter_rect_y2 - inter_rect_y1 + 1;\n        if (inter_area2<0) {\n            inter_area2=0;\n        }\n\n        inter_area = inter_area1 * inter_area2;\n\n        b1_area = (b1_x2 - b1_x1 + 1) * (b1_y2 - b1_y1 + 1);\n        b2_area = (b2_x2 - b2_x1 + 1) * (b2_y2 - b2_y1 + 1);\n\n        iou = inter_area / (b1_area + b2_area - inter_area + 1e-16);\n        if (iou<0.6) {\n            index_iou[iindex_iou] = box2[ibox];\n            iindex_iou++;\n        }\n    }\n    return index_iou;\n}\n\nfunction toBBox(finalArray, obj) {\n    bbox = [];\n    ibbox = 0;\n    maxindex = finalArray.length;\n\n    for (z=0; z<maxindex; z++) {\n        data = {};\n        data['@x1'] = finalArray[z][0]/512 - 0.01;\n        data['@y1'] = finalArray[z][1]/320 - 0.01;\n        data['@x2'] = finalArray[z][2]/512 + 0.01;\n        data['@y2'] = finalArray[z][3]/320 + 0.01;\n        data.label = obj[finalArray[z][5]];\n        data.probability =finalArray[z][4];\n        bbox[ibbox] = data;\n        ibbox++;\n    }\n    return bbox;\n}\n\nfunction findCoors(boxcoor) {\n    tempcoor = [];\n    mtempout = [];\n    for (icoor = 0; icoor<boxcoor.length; icoor++) {\n        x1 = Math.round(boxcoor[icoor][0]) - 6;\n        x2 = Math.round(boxcoor[icoor][2]) + 6;\n        y1 = Math.round(boxcoor[icoor][1]) - 4;\n        y2 = Math.round(boxcoor[icoor][3]) + 4;\n        mtempout[icoor] = boxcoor[icoor][5];\n        tempcoor[icoor] = [x1, x2, y1, y2];\n    }\n    return [tempcoor, mtempout];\n}\n\nfunction findXY(coor) {\n    filtercoor = [];\n    filterXY = [];\n    for (i=0; i<coor.length; i++) {\n        dict1  = {};\n        if (coor[i][\"label\"] === \"mask\" || coor[i][\"label\"] === \"nomask\") {\n            dict1['x'] = (coor[i][\"@x2\"] + coor[i][\"@x1\"])/2;\n            dict1['y'] = (coor[i][\"@y2\"] + coor[i][\"@y1\"])/2;\n            filterXY[i] = dict1;\n            filtercoor[i] = coor[i];\n        }\n        else {\n            //pass\n        }\n    }\n    return filterXY;\n}\n\nfunction findDistance (x2, x1, y2, y1) {\n    return Math.sqrt((Math.pow((x2 - x1), 2)) + (Math.pow((y2 - y1), 2)));\n}\n\nfunction classDist(coors) {\n    dist = [];\n    icoors = 0;\n    thres_dist = 0.3;\n    for (j=coors.length; j>0; j--) {\n        x = coors[j - 1]['x'];\n        y = coors[j - 1]['y'];\n        for (k=0; k<j-1; k++) {\n            coortemp = {};\n            if (findDistance (x, coors[k]['x'], y, coors[k]['y']) < thres_dist) {\n                coortemp['cx1'] = x;\n                coortemp['cy1'] = y;\n                coortemp['cx2'] = coors[k]['x'];\n                coortemp['cy2'] = coors[k]['y'];\n                dist[icoors] = coortemp;\n                icoors++;\n            }\n        } \n    }\n    return dist;\n}\n\nvar tempmask = findCoors(lastmaxdetection);\nmsg.person = lastmaxdetection.length;\nmsg.numnomask = process_detected_nomask.length;\nmsg.nummask = process_detected_mask.length;;\nmsg.cropcoors = tempmask[0];\nmsg.moutarr = tempmask[1];\nvar bbox = toBBox(lastmaxdetection, obj);\nmsg.bbox = bbox;\nvar toClass = classDist(findXY(bbox));\nmsg.alert = toClass.length;\nreturn {msg: msg, metadata: metadata, msgType: msgType};"
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 1316,
+          "layoutY": 423
+        },
+        "type": "org.thingsboard.rule.engine.telemetry.TbMsgTimeseriesNode",
+        "name": "Save all to timeseries",
+        "debugMode": true,
+        "configuration": {
+          "defaultTTL": 0
+        }
+      }
+    ],
+    "connections": [
+      {
+        "fromIndex": 0,
+        "toIndex": 13,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 1,
+        "toIndex": 2,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 2,
+        "toIndex": 3,
+        "type": "Post telemetry"
+      },
+      {
+        "fromIndex": 3,
+        "toIndex": 0,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 4,
+        "toIndex": 5,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 5,
+        "toIndex": 6,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 6,
+        "toIndex": 7,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 7,
+        "toIndex": 14,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 7,
+        "toIndex": 12,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 8,
+        "toIndex": 9,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 9,
+        "toIndex": 10,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 10,
+        "toIndex": 11,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 11,
+        "toIndex": 4,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 12,
+        "toIndex": 14,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 13,
+        "toIndex": 8,
+        "type": "Success"
+      }
+    ],
+    "ruleChainConnections": null
+  }
+}
