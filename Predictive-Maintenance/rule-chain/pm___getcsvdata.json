@@ -1,0 +1,71 @@
+{
+  "ruleChain": {
+    "additionalInfo": {
+      "description": ""
+    },
+    "name": "PM - getcsvdata",
+    "type": "CORE",
+    "firstRuleNodeId": null,
+    "root": false,
+    "debugMode": true,
+    "configuration": null
+  },
+  "metadata": {
+    "firstNodeIndex": 0,
+    "nodes": [
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 277,
+          "layoutY": 151
+        },
+        "type": "org.thingsboard.rule.engine.profile.TbDeviceProfileNode",
+        "name": "profile",
+        "debugMode": true,
+        "configuration": {
+          "persistAlarmRulesState": false,
+          "fetchAlarmRulesStateOnStart": false
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 550,
+          "layoutY": 151
+        },
+        "type": "org.thingsboard.rule.engine.filter.TbMsgTypeSwitchNode",
+        "name": "switch",
+        "debugMode": true,
+        "configuration": {
+          "version": 0
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 561,
+          "layoutY": 246
+        },
+        "type": "org.thingsboard.rule.engine.telemetry.TbMsgTimeseriesNode",
+        "name": "csv data",
+        "debugMode": true,
+        "configuration": {
+          "defaultTTL": 0
+        }
+      }
+    ],
+    "connections": [
+      {
+        "fromIndex": 0,
+        "toIndex": 1,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 1,
+        "toIndex": 2,
+        "type": "Post telemetry"
+      }
+    ],
+    "ruleChainConnections": null
+  }
+}

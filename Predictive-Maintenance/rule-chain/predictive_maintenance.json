@@ -1,0 +1,131 @@
+{
+  "ruleChain": {
+    "additionalInfo": {
+      "description": ""
+    },
+    "name": "Predictive Maintenance",
+    "type": "CORE",
+    "firstRuleNodeId": null,
+    "root": false,
+    "debugMode": true,
+    "configuration": null
+  },
+  "metadata": {
+    "firstNodeIndex": 4,
+    "nodes": [
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 394,
+          "layoutY": 198
+        },
+        "type": "org.thingsboard.rule.engine.transform.TbModelNode",
+        "name": "pm",
+        "debugMode": true,
+        "configuration": {
+          "resourceId": "ee237fb0-62d6-11ec-b0a8-753eb00f392e",
+          "inputNames": [
+            "input"
+          ],
+          "outputNames": [
+            "output"
+          ]
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 394,
+          "layoutY": 301
+        },
+        "type": "org.thingsboard.rule.engine.transform.TbTransformMsgNode",
+        "name": "output",
+        "debugMode": true,
+        "configuration": {
+          "jsScript": "if(parseInt(msg.output) == 0){\n    msg.result = \"Normal\";\n}else{\n    msg.result = \"Require maintenance\"; \n}\n\nreturn {msg: msg, metadata: metadata, msgType: msgType};"
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 397,
+          "layoutY": 394
+        },
+        "type": "org.thingsboard.rule.engine.telemetry.TbMsgTimeseriesNode",
+        "name": "save data",
+        "debugMode": true,
+        "configuration": {
+          "defaultTTL": 0
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 385,
+          "layoutY": 85
+        },
+        "type": "org.thingsboard.rule.engine.transform.TbTransformMsgNode",
+        "name": "input",
+        "debugMode": true,
+        "configuration": {
+          "jsScript": "//inputdata is string\n//string to array\nvar s2a = msg.inputid.split(',');\n//change string to float\nfor(var f=0; f<s2a.length;f++){\n    s2a[f] = parseFloat(s2a[f]);\n}\n//1d to 2d array\nvar data = new Array(s2a.length/30);\nfor (var a = 0; a < data.length; a++) {\n    data[a] = new Array(30);\n}\nvar cumulative = -1;\nfor(var i=0; i<s2a.length/30; i++){\n    for(var j=0; j<30; j++){\n        cumulative = cumulative+1;\n        data[i][j] = s2a[cumulative];\n    }\n}\n\nvar useddata = [];\n//if >30 row (takes latest 30 cycle)\nfor(var c=0; c<31; c++){\n    useddata[30-c] =  data[data.length-c];\n}\n\nvar cleancsv = [];\n//remove index 4,5,9,14,20,22,23,27,28,29 (contain null or not useful)\nfor(var j=0; j<30; j++){\n    var tempcsv = [];\n    var l = -1;\n    for(var k=0; k<30; k++){\n        if(k!=4 && k!=5 && k!=9 && k!=14 && k!=20 && k!=22 && k!=23 && k!=27 && k!=28 && k!=29){\n            l = l + 1;\n            tempcsv[l] = useddata[j][k];\n        }        \n    }\n    cleancsv[j] = tempcsv;\n}\n\nmsg.chartinput = cleancsv.toString();\nmsg.input = [cleancsv];\nreturn {msg: msg, metadata: metadata, msgType: msgType};"
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 43,
+          "layoutY": 218
+        },
+        "type": "org.thingsboard.rule.engine.profile.TbDeviceProfileNode",
+        "name": "input profile",
+        "debugMode": true,
+        "configuration": {
+          "persistAlarmRulesState": false,
+          "fetchAlarmRulesStateOnStart": false
+        }
+      },
+      {
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 48,
+          "layoutY": 299
+        },
+        "type": "org.thingsboard.rule.engine.filter.TbMsgTypeSwitchNode",
+        "name": "message switch",
+        "debugMode": true,
+        "configuration": {
+          "version": 0
+        }
+      }
+    ],
+    "connections": [
+      {
+        "fromIndex": 0,
+        "toIndex": 1,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 1,
+        "toIndex": 2,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 3,
+        "toIndex": 0,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 4,
+        "toIndex": 5,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 5,
+        "toIndex": 3,
+        "type": "Post telemetry"
+      }
+    ],
+    "ruleChainConnections": null
+  }
+}
