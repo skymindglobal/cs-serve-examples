@@ -1,6 +1,6 @@
 # Model File - Example for Optical Character Recognition
 
-Click the link below to download the model for optical character recognition example:
+Click the link below to download the models for optical character recognition example:
 
 <b>Vehicle Plate Detection Model</b>: https://drive.google.com/file/d/1EoigahgqB-MPFSeA8_85FjnmfwxNi-84/view?usp=sharing
 
