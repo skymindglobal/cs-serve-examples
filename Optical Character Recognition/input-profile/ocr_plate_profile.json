@@ -1,0 +1,31 @@
+{
+  "name": "ocr_plate",
+  "description": "",
+  "image": null,
+  "type": "DEFAULT",
+  "transportType": "DEFAULT",
+  "provisionType": "DISABLED",
+  "defaultRuleChainId": {
+    "entityType": "RULE_CHAIN",
+    "id": "e9656d30-7a55-11ec-94c0-0f9ef435af7e"
+  },
+  "defaultDashboardId": null,
+  "defaultQueueName": null,
+  "profileData": {
+    "configuration": {
+      "type": "DEFAULT"
+    },
+    "transportConfiguration": {
+      "type": "DEFAULT"
+    },
+    "provisionConfiguration": {
+      "type": "DISABLED",
+      "provisionDeviceSecret": null
+    },
+    "alarms": null
+  },
+  "provisionDeviceKey": null,
+  "firmwareId": null,
+  "softwareId": null,
+  "default": false
+}
